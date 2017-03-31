@@ -25,7 +25,7 @@ SECRET_KEY = '8m32+ex0e*(ad)u0sd6shlcp*14r17g#ull_-$jm@xwfciy-l('
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['pywims.pythonanywhere.com', '127.0.0.1']
 
 
 # Application definition

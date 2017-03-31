@@ -1,3 +1,4 @@
 from django.shortcuts import render
 
-# Create your views here.
+def liste_exos(request):
+	return render(request, 'pywims_exos/liste_exos.html', {})
