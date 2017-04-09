@@ -1,0 +1,45 @@
+<!doctype html>
+<head>
+<title>Essai Geogebra</title>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+      processEscapes: true,
+    },
+    menuSettings: { inTabOrder : false }
+  });
+</script>
+
+<script type="text/javascript" src="static/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML-full"></script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+<script type="text/javascript" src="http://www.geogebratube.org/scripts/deployggb.js"></script>
+<script type="text/javascript">
+var applet1 = new GGBApplet({filename: "geogebra-applet.ggb", width:500, height:500}, true);
+window.onload = function() {
+        applet1.inject('applet_container1', 'preferHTML5');
+    }
+
+function getCoords(objName) {
+  var applet = document.ggbApplet;
+  var x = applet.getXcoord(objName);
+  var y = applet.getYcoord(objName);
+
+  document.coordForm.getXfield.value = x;
+  document.coordForm.getYfield.value = y;
+}
+</script>
+</head>
+
+<body>
+
+l'applet geogebra
+<div id="applet_container1" style = 'border:1px solid red'></div>
+est ici
+
+</body>
+

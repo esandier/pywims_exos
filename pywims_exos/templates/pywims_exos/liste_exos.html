@@ -1,18 +1,64 @@
-<html>
-<head>
-<title>PyWims-Liste</title>
-</head>
-<body>
-<div>
-<h1><a href="">Liste des exos PyWims</a></h1>
+{% extends 'pywims_exos/layout_appli.html' %}
+
+{% block contenu %}
+<script>
+$( document ).ready(function(){
+	$( "#item-add-div" ).hide();
+
+	$( "#plus_button" ).click(function() {
+		$( "#item-add-div" ).toggle(function() {
+			$( "#item-add" ).val('');
+			$( "#item-add" ).focus();
+		});
+	});
+
+	$( "#item-add" ).change(function() {
+		var title = $( this ).val()
+		var status = {'requested_action':'new', 'title': title};
+		console.log(status);
+    $.ajax({
+      type : "POST",
+      url : "{% url 'liste_exos' %}",
+      data: JSON.stringify(status, null, '\t'),
+      contentType: 'application/json;charset=UTF-8',
+      success: function(returned_status) {
+         window.location.replace("{% url 'liste_exos' %}");
+      }
+    });
+  });
+});
+</script>
+
+<div class = 'titre-liste'>
+	<h1><a href="/">Liste des exos PyWims</a></h1>
+	<button id = 'plus_button' class="top-menu"><span class="glyphicon glyphicon-plus"></span></button>
 </div>
 
-{% for exo in exos %}
-    <div>
-		<h1><a href="">{{ exo.title }}</a></h1>
-		<p>{{ exo.author }}</p>
-	</div>
-{% endfor %}
+<div class="content container">
+	<div class="row">
+		<div class="col-md-8"  id = 'liste-exos'>
+			{% for exo in exos %}
+			<div class = 'item-liste'>
+				<a href="{% url 'delete_exo' pk=exo.pk %}" class="list-menu"><span class="glyphicon glyphicon-trash"></span></a>
+				<a href="{% url 'dev_exo' pk=exo.pk %}" class="list-menu"><span class="glyphicon glyphicon-pencil"></span></a>
+				<div style = 'display:inline-block'>
+					<a href="{% url 'run_exo' pk=exo.pk %}" class="list-menu">
+						<h1>{{ exo.title }}	</h1>
+					</a>
+					<p>{{ exo.author }}</p>
+				</div>
+			</div>
+			{% endfor %}
 
-</body>
-</html>
+			<div id='item-add-div' class = 'item-liste' display='none'>
+				<a class="list-menu"><span class="glyphicon glyphicon-pencil"></span></a>
+				<div style = 'display:inline-block'>
+					<input  id='item-add' class='item-liste'>
+					<p> {{ request.user.username }} </p>
+				</div>
+			</div>
+
+		</div>
+	</div>
+</div>
+{% endblock %}

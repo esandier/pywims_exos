@@ -1,0 +1,26 @@
+{% extends 'pywims_exos/layout_appli.html' %}
+
+{% block contenu %}
+<script>
+$( document ).ready(function(){
+	if(window.top != window.self) {
+		$('#home-link').remove();
+	}
+});
+</script>
+
+<div class = 'titre-liste'>
+	<h1><a href="/">PyWims, énoncé</a></h1>
+	<a id='home-link' href="/" class="top-menu"><span class="glyphicon glyphicon-home"></span></a>
+</div>
+
+<div class='exo'>
+	<form action="{% url 'corrige_exo' pk=pk %}" id = "form_exo" method="post" autocomplete = "off">
+		<div class='form-enonce'>
+			{% block enonce_exo %}{% endblock %}
+		</div>
+
+		<div class = validation-enonce> <input class = 'input' type=submit value=Valider> </div>
+	</form>
+</div>
+{% endblock %}

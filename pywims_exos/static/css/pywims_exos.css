@@ -1,0 +1,220 @@
+.titre-liste {
+	background-color: #ff9400;
+	margin-top: 0;
+	padding: 20px 20px 20px 40px;
+	display:flex;
+	justify-content: space-between;
+}
+.titre-liste h1, .titre-liste h1 a, .titre-liste h1 a:visited, .titre-liste h1 a:active {
+	color: #ffffff;
+	font-size: 24pt;
+	text-decoration: none;
+}
+div.item-liste{
+	display:flex;
+	margin-top: 10px;
+}
+.content {
+	margin-left: 20px;
+}
+h1, h2, h3, h4, input.item-liste {
+	font-family: 'Crete Round', serif;
+	font-size: 18pt;
+	color: SteelBlue;
+	margin: 0px;
+}
+h2 {
+	font-size: 1.2em;
+}
+.date {
+	color: #828282;
+}
+.save {
+	float: right;
+}
+.top-menu, .top-menu:hover, .top-menu:visited {
+	background:inherit;
+	border:none;
+	color: #ffffff;
+	font-size: 18pt;
+	margin-right: 20px;
+	align-self:center;
+}
+.list-menu, .list-menu:hover, .list-menu:visited {
+	color: #ff9400;
+	float: left;
+	font-size: 18pt;
+	margin-right: 10px;
+	align-self:top;
+}
+/** {
+    box-sizing: border-box;
+}*/
+div.dev_exos {
+	background: #eee;
+	display :flex;
+	justify-content:center;
+	flex-flow: row wrap;
+	margin:0;
+	border: none;
+	height:100vh;
+}
+iframe.exo {
+	flex:1;
+   	margin:0;
+   	border:none;
+   	align-self:stretch;
+   	display:flex;
+}
+div.exo {
+  flex: 1;
+	max-width: 45em;
+	padding: 0.8em;
+	background: white;
+	font-family: 'Crete Round', serif;
+	font-size : 13pt;
+	color: SteelBlue;
+	text-align:center;
+	align-self:center;
+}
+div.volet-editeur {
+	flex:1.6;
+	display:flex;
+	flex-direction:column;
+	align-items:stretch;
+	height:100vh;
+	min-width:300px;
+	border-right: 4px solid Plum;
+	}
+div.menu {
+	z-index:0;
+   	background:Plum;
+   	font-size: 12px;
+   	border-bottom: 2px solid Black;
+		display:flex;
+		justify-content: space-between;
+}
+div.editeur {
+	height:100%;
+	background: White;
+   	border-right:2px solid Black;
+}
+button.onglet, button.onglet-sel, button.menu, select.menu, button.menu-echo {
+	border:none;
+	color: black;
+	background:Plum;
+	padding: 3px 5px;
+	margin-left: 10px;
+	margin-bottom:5px;
+	text-align: center;
+	text-decoration: none;
+	font-family: 'Crete Round', sans-serif;
+	font-size:11pt;
+}
+button.onglet-sel {
+	border-bottom:2px solid Black;
+}
+
+button.menu {
+	border:2px solid white;
+	border-radius: 10px;
+	margin: 10px;
+}
+
+button.menu:focus, button.menu-echo:focus, button.onglet:focus, button.onglet-sel:focus {
+	    outline: none;
+   }
+button.menu:hover {
+	    background: LightSteelBlue;
+  }
+
+button.menu-echo {
+	font-family: 'Crete Round', serif;
+	font-size:13pt;
+	color:white;
+}
+
+.input, .cible, .source, .contenu, .cibleOK, .cibleNotOK {
+	border : 2px solid Black;
+	border-radius:8px;
+	font-family: 'Montserrat', sans-serif;
+	font-size: 11pt;
+	color:black;
+	width: auto;
+	}
+
+div.cible, div.source, div.cibleOk, div.cibleNotOk {
+   	display: inline-flex;
+   	border:none;
+	width: 10em;
+	height: auto;
+	margin : 6px;
+    	vertical-align:top;
+	justify-content: center;
+	align-items: center;
+	text-align:center;
+}
+div.cible  {
+	background:LightCyan;
+	border : 2px solid LightBlue;
+}
+div.cibleOk {
+	background:LightGreen;
+}
+div.cibleNotOk  {
+	background:LightPink;
+}
+div.source  {
+	background:LightBlue;
+}
+.contenu {
+	display:flex;
+	position:absolute;
+	background:inherit;
+	height:inherit;
+	width:inherit;
+	justify-content: center;
+	align-items: center;
+	text-align:center;
+	font-size: 1em;
+}
+span.bonne_reponse {
+	background:LightGreen;
+}
+span.mauvaise_reponse {
+	background:LightPink;
+}
+
+
+.form-enonce {
+    	display: inline-block;
+	text-align:left;
+}
+.validation-enonce {
+	font-size: 1em;
+	padding: 0.3em;
+	margin-top: 1em;
+	background: WhiteSmoke;
+	border-bottom: 1px solid LightGrey;
+	text-align:right;
+}
+.feedback  {
+	font:  italic  bold 1em  Georgia,serif;
+	margin:0;
+	padding:0.5em;
+	text-align:center;
+	height:2em;
+}
+
+
+.form    { font-size: 0.9em; }
+.entries        { list-style: none; margin: 0; padding: 0; }
+.entries li     { margin: 0.8em 1.2em; }
+.entries li h2{ margin-left: -1em; }
+.add-entry   { font-size: 0.9em; border-bottom: 1px solid LightGrey; }
+.add-entry dl{ font-weight: bold; }
+.metanav     { text-align: right; font-size: 0.8em; padding: 0.3em;
+                  margin-bottom: 1em; background: #fafafa; }
+.flash           { background: #cee5F5; padding: 0.5em;
+                  border: 1px solid #aacbe2; }
+.error           { background: #f0d6d6; padding: 0.5em; }

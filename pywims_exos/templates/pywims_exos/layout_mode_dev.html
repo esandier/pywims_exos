@@ -1,0 +1,78 @@
+{% extends "pywims_exos/layout_appli.html" %}
+{% load json_filter %}
+{% block contenu  %}
+
+ <!--This is a comment. Comments are not displayed in the browser-->
+
+ <script src="https://ajaxorg.github.io/ace-builds/src/ace.js" type="text/javascript" charset="utf-8"></script>
+ <script>
+ $( document ).ready(function(){
+ var editor = ace.edit("editeur");
+ var status = {{ status|tojson }};
+ console.log(status);
+ editor.setTheme("ace/theme/tomorrow");
+ editor.getSession().setMode("ace/mode/"+ status.langage);
+ editor.getSession().setUseWrapMode(true);
+ editor.getSession().setValue(status.exo[status['current_code']]);
+ document.getElementById('editeur').style.fontSize='14px';
+ editor.setAutoScrollEditorIntoView(true);
+ editor.resize();
+
+ $( "#"+status['current_code']+"_button").attr('class', 'onglet-sel');
+
+ $( "#preview_button, #home_button" ).click(function() {
+   status.exo[status['current_code']] = editor.getValue();status.exo['enonce']
+   console.log(status.exo['enonce'])
+   // on enlève '_button' au nom du bouton pour obtenir l'action requise
+   status['requested_action'] = this.id.slice(0, -7);
+   $.ajax({
+     type : "POST",
+     url : "{% url 'dev_exo' pk=pk %}",
+     data: JSON.stringify(status, null, '\t'),
+     contentType: 'application/json;charset=UTF-8',
+     success: function(returned_status) {
+       status = returned_status
+       if (status['requested_action'] == 'preview')
+        document.getElementById('frame_exo').contentWindow.location.reload();
+      if (status['requested_action'] == 'home')
+        window.location.replace("{% url 'liste_exos' %}");
+     }
+   });
+ });
+ $( "#avant_button, #apres_button, #enonce_button, #reponse_button" ).on( "click", function() {
+   $( "#"+status['current_code']+"_button").attr('class', 'onglet');
+   status.exo[status['current_code']] = editor.getValue();
+   // on enlève '_button' au nom du bouton pour obtenir la partie du code à afficher
+   status['current_code'] = this.id.slice(0, -7);
+   if ((status['current_code'] == 'avant') || (status['current_code'] == 'apres'))
+      status['langage'] = 'python';
+   else status['langage'] = 'django';
+
+   editor.setValue(status.exo[status['current_code']], -1);
+   editor.getSession().setMode("ace/mode/"+ status['langage']);
+   $( "#"+status['current_code']+"_button").attr('class', 'onglet-sel');
+ });
+});
+</script>
+
+<div class = 'dev_exos'>
+  <div class = 'volet-editeur'>
+    <div class='menu'>
+      <div  style = 'display:inline-block'>
+        <button class = 'menu-echo' type="button" id = 'titre'> {{ status.exo.title }} </button>
+        <br>
+        <button class = 'onglet' type="button" id = 'avant_button'> Avant </button>
+        <button class = 'onglet' type="button" id = 'enonce_button'> Enoncé </button>
+        <button class = 'onglet' type="button" id = 'apres_button'> Après </button>
+        <button class = 'onglet' type="button" id = 'reponse_button'> Réponse </button>
+      </div>
+      <div  style = 'display:inline-flex; align-content:center'>
+        <button class=  'top-menu' type="button" id='home_button'><span class="glyphicon glyphicon-home"></span></button>
+        <button class = 'top-menu' type="button" id='preview_button'><span class="glyphicon glyphicon-play"></span> </button>
+      </div>
+    </div>
+    <div class='editeur' id='editeur' > </div>
+  </div>
+  <iframe class='exo' id = 'frame_exo' src="{% url 'run_exo' pk=pk %}"></iframe>
+</div>
+ {% endblock %}

@@ -1,0 +1,52 @@
+{% load static %}
+
+<html>
+<head>
+	<title>PyWims</title>
+	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+	<link href="//fonts.googleapis.com/css?family=Lobster&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+	<link href="//fonts.googleapis.com/css?family=Crete+Round&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+	<link rel="stylesheet" href="{% static 'css/pywims_exos.css' %}">
+	<script type="text/x-mathjax-config">
+	MathJax.Hub.Config({
+		tex2jax: {
+			inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+			displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+			processEscapes: true,
+		},
+		menuSettings: { inTabOrder : false }
+	});
+	</script>
+	<script type="text/javascript"
+	src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+	</script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+	<script>
+	function allowDrop(ev) {
+	    ev.preventDefault();
+	}
+	function drag(ev) {
+	    ev.dataTransfer.setData("text", ev.target.id);
+	}
+	function drop(ev, target)
+	{
+		ev.preventDefault();
+
+		if (!ev.target.getAttribute("ondrop")) return false;
+
+		var data=ev.dataTransfer.getData("text");
+		document.getElementById(target).appendChild(document.getElementById(data));
+
+		var input=document.getElementById('input_'+data);
+		if (target != undefined) input.value = target;
+		if (target == undefined) input.value = '';
+	}
+	</script>
+</head>
+<body>
+				{% block contenu %}
+				{% endblock %}
+</body>
+</html>
