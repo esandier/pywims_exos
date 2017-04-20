@@ -42,7 +42,7 @@ def liste_exos(request):
 		exos = Exo.objects.all().order_by('title')
 		return render(request, 'pywims_exos/liste_exos.html', {'exos': exos})
 	if request.method == 'POST':
-		status = json.loads(request.body)
+		status = json.loads(request.body.decode())
 		exo = Exo()
 		print(status)
 		exo.title = status['title']
@@ -115,9 +115,9 @@ def dev_exo(request, pk):# TODO : affiche la page de développement
 
 	if request.method == 'POST':
 		print('POST')
-		status = json.loads(request.body)
+		status = json.loads(request.body.decode())
 
-		if status['requested_action'] == 'preview':
+		if (status['requested_action'] == 'preview') or (status['requested_action'] == 'home'):
 			print('PREVIEW')
 			exo = get_object_or_404(Exo, pk=status['exo']['pk'])
 			exo.assign(status['exo'])

@@ -4,12 +4,11 @@
 
  <!--This is a comment. Comments are not displayed in the browser-->
 
- <script src="https://ajaxorg.github.io/ace-builds/src/ace.js" type="text/javascript" charset="utf-8"></script>
- <script>
- $( document ).ready(function(){
+<script src="https://ajaxorg.github.io/ace-builds/src/ace.js" type="text/javascript" charset="utf-8"></script>
+<script>
+$( document ).ready(function(){
  var editor = ace.edit("editeur");
  var status = {{ status|tojson }};
- console.log(status);
  editor.setTheme("ace/theme/tomorrow");
  editor.getSession().setMode("ace/mode/"+ status.langage);
  editor.getSession().setUseWrapMode(true);
@@ -18,7 +17,7 @@
  editor.setAutoScrollEditorIntoView(true);
  editor.resize();
 
- $( "#"+status['current_code']+"_button").attr('class', 'onglet-sel');
+ $( "#"+status['current_code']+"_button").attr('class', 'dev-onglet-sel');
 
  $( "#preview_button, #home_button" ).click(function() {
    status.exo[status['current_code']] = editor.getValue();status.exo['enonce']
@@ -33,46 +32,47 @@
      success: function(returned_status) {
        status = returned_status
        if (status['requested_action'] == 'preview')
-        document.getElementById('frame_exo').contentWindow.location.reload();
-      if (status['requested_action'] == 'home')
-        window.location.replace("{% url 'liste_exos' %}");
+       document.getElementById('frame_exo').contentWindow.location.reload();
+       if (status['requested_action'] == 'home')
+       window.location.replace("{% url 'liste_exos' %}");
      }
    });
  });
+
  $( "#avant_button, #apres_button, #enonce_button, #reponse_button" ).on( "click", function() {
-   $( "#"+status['current_code']+"_button").attr('class', 'onglet');
+   $( "#"+status['current_code']+"_button").attr('class', 'dev-onglet');
    status.exo[status['current_code']] = editor.getValue();
    // on enlève '_button' au nom du bouton pour obtenir la partie du code à afficher
    status['current_code'] = this.id.slice(0, -7);
    if ((status['current_code'] == 'avant') || (status['current_code'] == 'apres'))
-      status['langage'] = 'python';
+   status['langage'] = 'python';
    else status['langage'] = 'django';
 
    editor.setValue(status.exo[status['current_code']], -1);
    editor.getSession().setMode("ace/mode/"+ status['langage']);
-   $( "#"+status['current_code']+"_button").attr('class', 'onglet-sel');
+   $( "#"+status['current_code']+"_button").attr('class', 'dev-onglet-sel');
  });
 });
 </script>
 
 <div class = 'dev_exos'>
-  <div class = 'volet-editeur'>
-    <div class='menu'>
+  <div class = 'dev-volet-editeur'>
+    <div class='dev-menu'>
       <div  style = 'display:inline-block'>
-        <button class = 'menu-echo' type="button" id = 'titre'> {{ status.exo.title }} </button>
-        <br>
-        <button class = 'onglet' type="button" id = 'avant_button'> Avant </button>
-        <button class = 'onglet' type="button" id = 'enonce_button'> Enoncé </button>
-        <button class = 'onglet' type="button" id = 'apres_button'> Après </button>
-        <button class = 'onglet' type="button" id = 'reponse_button'> Réponse </button>
+          <button class = 'dev-titre' type="button" id = 'titre'> {{ status.exo.title }} </button>
+          <br>
+          <button class = 'dev-onglet' type="button" id = 'avant_button'> Avant </button>
+          <button class = 'dev-onglet' type="button" id = 'enonce_button'> Enoncé </button>
+          <button class = 'dev-onglet' type="button" id = 'apres_button'> Après </button>
+          <button class = 'dev-onglet' type="button" id = 'reponse_button'> Réponse </button>
       </div>
       <div  style = 'display:inline-flex; align-content:center'>
-        <button class=  'top-menu' type="button" id='home_button'><span class="glyphicon glyphicon-home"></span></button>
-        <button class = 'top-menu' type="button" id='preview_button'><span class="glyphicon glyphicon-play"></span> </button>
+        <button class=  'dev-glyph' type="button" id='home_button'><span class="glyphicon glyphicon-home"></span></button>
+        <button class = 'dev-glyph' type="button" id='preview_button'><span class="glyphicon glyphicon-play"></span> </button>
       </div>
     </div>
     <div class='editeur' id='editeur' > </div>
-  </div>
+    </div>
   <iframe class='exo' id = 'frame_exo' src="{% url 'run_exo' pk=pk %}"></iframe>
 </div>
  {% endblock %}

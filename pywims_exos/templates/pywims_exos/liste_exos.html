@@ -12,26 +12,29 @@ $( document ).ready(function(){
 		});
 	});
 
-	$( "#item-add" ).change(function() {
-		var title = $( this ).val()
-		var status = {'requested_action':'new', 'title': title};
-		console.log(status);
-    $.ajax({
-      type : "POST",
-      url : "{% url 'liste_exos' %}",
-      data: JSON.stringify(status, null, '\t'),
-      contentType: 'application/json;charset=UTF-8',
-      success: function(returned_status) {
-         window.location.replace("{% url 'liste_exos' %}");
-      }
-    });
-  });
+	$( "#item-add" ).bind('keypress', function(e) {
+		var code = e.keyCode || e.which;
+		if (code == 13) {
+			var title = $( this ).val()
+			var status = {'requested_action':'new', 'title': title};
+			console.log(status);
+			$.ajax({
+				type : "POST",
+				url : "{% url 'liste_exos' %}",
+				data: JSON.stringify(status, null, '\t'),
+				contentType: 'application/json;charset=UTF-8',
+				success: function(returned_status) {
+					window.location.replace("{% url 'liste_exos' %}");
+				}
+			});
+		}
+	});
 });
 </script>
 
 <div class = 'titre-liste'>
 	<h1><a href="/">Liste des exos PyWims</a></h1>
-	<button id = 'plus_button' class="top-menu"><span class="glyphicon glyphicon-plus"></span></button>
+	<button id = 'plus_button' class="glyph"><span class="glyphicon glyphicon-plus"></span></button>
 </div>
 
 <div class="content container">
@@ -39,10 +42,10 @@ $( document ).ready(function(){
 		<div class="col-md-8"  id = 'liste-exos'>
 			{% for exo in exos %}
 			<div class = 'item-liste'>
-				<a href="{% url 'delete_exo' pk=exo.pk %}" class="list-menu"><span class="glyphicon glyphicon-trash"></span></a>
-				<a href="{% url 'dev_exo' pk=exo.pk %}" class="list-menu"><span class="glyphicon glyphicon-pencil"></span></a>
+				<a href="{% url 'delete_exo' pk=exo.pk %}" class="list-glyph"><span class="glyphicon glyphicon-trash"></span></a>
+				<a href="{% url 'dev_exo' pk=exo.pk %}" class="list-glyph"><span class="glyphicon glyphicon-pencil"></span></a>
 				<div style = 'display:inline-block'>
-					<a href="{% url 'run_exo' pk=exo.pk %}" class="list-menu">
+					<a href="{% url 'run_exo' pk=exo.pk %}" class="list-title">
 						<h1>{{ exo.title }}	</h1>
 					</a>
 					<p>{{ exo.author }}</p>
@@ -51,7 +54,7 @@ $( document ).ready(function(){
 			{% endfor %}
 
 			<div id='item-add-div' class = 'item-liste' display='none'>
-				<a class="list-menu"><span class="glyphicon glyphicon-pencil"></span></a>
+				<a class="list-glyph"><span class="glyphicon glyphicon-pencil"></span></a>
 				<div style = 'display:inline-block'>
 					<input  id='item-add' class='item-liste'>
 					<p> {{ request.user.username }} </p>
