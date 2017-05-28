@@ -28,7 +28,7 @@ def is_equal(a, b):
 def for_template(arg):
 # renvoie arg dans un bon format pour l'affichage dans un template html avec mathjax. Si arg est une liste, s'applique récursivement aux éléments de arg.
     if ('sympy' in str(type(type(arg)))) or  ('sympy' in str(type(arg))): # selon les cas 'sympy' n'est pas dans type(arg), mais dans type(type(arg)). C'est de la cuisine.
-        return  r'\(\displaystyle '+latex(arg, mat_delim="(")+r'\)'       # par défaut l'output latex est inline, mais en \displaystyle.
+        return  r'\displaystyle '+latex(arg, mat_delim="(")        # par défaut l'output latex n'a pas les $, mais est en 'displaystyle'.
     elif type(arg) in [int, float, str] :
         return arg
     elif isinstance(arg, dict):
