@@ -30,15 +30,16 @@
 	function drag(ev) {
 	    ev.dataTransfer.setData("text", ev.target.id);
 	}
-	function drop(ev, target)
+	function drop(ev, target) // target est l'id de la source du drop
 	{
 		ev.preventDefault();
 
 		if (!ev.target.getAttribute("ondrop")) return false;
-
+		// data est l'id de la cible du drop
 		var data=ev.dataTransfer.getData("text");
+		// Le drop
 		document.getElementById(target).appendChild(document.getElementById(data));
-
+		// Renseignement de la variable via un champ "input" caché, dont l'id est celle le la cible, préfacée par 'input_'
 		var input=document.getElementById('input_'+data);
 		if (target != undefined) input.value = target;
 		if (target == undefined) input.value = '';

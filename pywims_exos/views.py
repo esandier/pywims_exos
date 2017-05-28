@@ -67,8 +67,8 @@ def run_exo(request, pk):
 	# Le dictionnaire envoyé au template doit être modifié:
 	# les expressions sympy sont transformées en Latex par la fonction for_template
 	contexte = for_template(dictionnaire)
-	contexte['pk'] = pk
 	# on ajoute la primary key de l'exo, utilisée quand on redirige vers la vue 'corrigé'
+	contexte['pk'] = pk
 
 	return HttpResponse(Template(en_tete_exo + exo.enonce + fin_exo).render(Context(contexte)))
 
@@ -82,7 +82,7 @@ def corrige_exo(request, pk):
 	reverse_form = {}
 	form_data = {}
 
-	# on ajoute au dictionnaire les données de formulaire, que l'on conserve séparéments
+	# on ajoute au dictionnaire les données de formulaire, que l'on conserve séparément
 	# On garde aussi un dictionnaire inversé des données de formulaire, utile pour l'affichage des
 	# champs drag-drop
 	for v in request.POST :
@@ -123,23 +123,6 @@ def dev_exo(request, pk):# TODO : affiche la page de développement
 			exo.assign(status['exo'])
 			exo.save()
 			status['echo']= exo.title
-			return HttpResponse(json.dumps(status), content_type='application/json')
-
-		elif status['requested_action'] == 'save':
-			print('SAVE_FILE')
-			exo = get_object_or_404(Exo, pk=status['exo']['pk'])
-			exo.assign(status['exo'])
-			exo.save()
-			status['echo'] = 'File saved'
-			return HttpResponse(json.dumps(status), content_type='application/json')
-
-		elif status['requested_action'] == 'save_as':
-			print('SAVE_AS')
-			new_exo = Exo()
-			new_exo.assign(status['exo'])
-			new_exo.title = status['title']
-			new_exo.save()
-			status['echo'] = new_exo.title
 			return HttpResponse(json.dumps(status), content_type='application/json')
 		else :
 			return HttpResponse(json.dumps(status), content_type='application/json')

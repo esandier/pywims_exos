@@ -6,8 +6,8 @@ from .fonctions import *
 
 
 def execution(code_string, dictionnaire):
-# execute le code python contenu dans "code_string", après avoir renseigné les variables présentes dans 'dictionnaireionnaire',
-# puis renvoie un dictionnaireionnaire de toutes les variables locales (définies dans 'dico' et définies par 'code_string')
+# execute le code python contenu dans "code_string", après avoir renseigné les variables présentes dans 'dictionnaire',
+# puis renvoie un dictionnaire de toutes les variables locales (définies dans 'dictionnaire' et définies par 'code_string')
 	class Code:
 		def __init__(self, dictionnaire):
 			for v in dictionnaire : exec(v+'=dictionnaire["'+v+'"]')
@@ -32,10 +32,12 @@ class Exo(models.Model):
 		return execution(self.avant, dictionnaire)
 
 	def exec_apres(self, dictionnaire):
+		# On ajoute comme variable le dictionnaire 'ok_answer', qui peut ête renseigné dans le corrigé
 		dictionnaire['ok_answer'] = {}
 		return execution(self.apres, dictionnaire)
 
 	def assign(self, object):
+	# permet de copier dans l'exo une variable python.
 		for key in object :
 			if hasattr(self, key): setattr(self, key, object[key])
 

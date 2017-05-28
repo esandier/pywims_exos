@@ -32,7 +32,7 @@ $( document ).ready(function(){
 });
 </script>
 
-<div class = 'titre-liste'>
+<div class = 'titre'>
 	<h1><a href="/">Liste des exos PyWims</a></h1>
 	<button id = 'plus_button' class="glyph"><span class="glyphicon glyphicon-plus"></span></button>
 </div>
@@ -54,6 +54,7 @@ $( document ).ready(function(){
 			{% endfor %}
 
 			<div id='item-add-div' class = 'item-liste' display='none'>
+				<a class="list-glyph"><span class="glyphicon glyphicon-trash"></span></a>
 				<a class="list-glyph"><span class="glyphicon glyphicon-pencil"></span></a>
 				<div style = 'display:inline-block'>
 					<input  id='item-add' class='item-liste'>

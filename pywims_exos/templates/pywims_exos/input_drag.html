@@ -3,6 +3,6 @@
 	ondrop="drop(event, 'cible_{{ name }}')"
 	ondragover='allowDrop(event)'
 	style = '{{style_boite}}'>
-	<div class = 'contenu' id='{{ name }}' draggable='true' ondragstart='drag(event)' style = '{{style_contenu}}'> {{ display }} </div>
+	<div class = 'drag-contenu' id='{{ name }}' draggable='true' ondragstart='drag(event)' style = '{{style_contenu}}'> {{ display }} </div>
 </div>
 <input type=hidden name='{{ name }}'  id='input_{{ name }}'>

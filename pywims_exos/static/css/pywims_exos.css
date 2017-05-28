@@ -1,3 +1,5 @@
+/* Général */
+
 * {
     box-sizing: border-box;
     -webkit-box-sizing: border-box;
@@ -6,46 +8,45 @@
 body {
   font-family: 'Crete Round', serif;
 }
-.titre-liste {
-	background-color: #ff9400;
-	margin-top: 0;
-	padding: 20px 20px 20px 40px;
-	display:flex;
-	justify-content: space-between;
-}
-.titre-liste h1, .titre-liste h1 a, .titre-liste h1 a:visited, .titre-liste h1 a:active {
+
+button.glyph:hover, button.dev-glyph:hover, button.dev-onglet:hover, a.list-glyph:hover {
+	    color: Grey; /* Couleur des glyphs quand on passe dessus */
+  }
+
+/* le titre-bandeau en haut de page */
+div.titre h1, div.titre h1 a, div.titre h1 a:visited, div.titre h1 a:active {
 	color: #ffffff;
 	font-size: 24pt;
 	text-decoration: none;
 }
+div.titre {
+	background-color: #ff9400;
+	margin-top: 0;
+  margin-bottom: 20px;
+	padding: 0px 10px 10px 20px;
+	display:flex;
+	justify-content: space-between;
+}
+
+/* View Liste-exos */
+
+.glyph, .glyph-visited, .dev-glyph,.dev-glyph:visited {
+	background:inherit;
+	border:none;
+	color: #ffffff; /* ce sont des glyphs blancs */
+	font-size: 18pt;
+	margin-right: 20px;
+	align-self:center;
+}
+
 div.item-liste{
 	display:flex;
 	margin-top: 10px;
 }
-.content {
-	margin-left: 20px;
-}
-h1, h2, h3, h4, input.item-liste {
+div.item-liste h1, input.item-liste {
 	font-size: 18pt;
 	color: SteelBlue;
 	margin: 0px;
-}
-h2 {
-	font-size: 1.2em;
-}
-.date {
-	color: #828282;
-}
-.save {
-	float: right;
-}
-.glyph, .glyph-visited, .dev-glyph,.dev-glyph:visited {
-	background:inherit;
-	border:none;
-	color: #ffffff;
-	font-size: 18pt;
-	margin-right: 20px;
-	align-self:center;
 }
 
 .list-glyph, .list-glyph:hover, .list-glyph:visited,.list-title, .list-title:hover, .list-title:visited {
@@ -56,13 +57,7 @@ h2 {
 	align-self:top;
 }
 
-button.dev-glyph:focus, button.dev-titre:focus, button.dev-onglet:focus, button.dev-onglet-sel:focus {
-	    outline: none;
-   }
-
-button.glyph:hover, button.dev-glyph:hover, button.dev-onglet:hover, .list-glyph:hover {
-	    color: Grey;
-  }
+/* View mode développement: conteneur des deux volets */
 
 div.dev_exos {
 	background: #eee;
@@ -73,23 +68,9 @@ div.dev_exos {
 	border: none;
 	height:100vh;
 }
-iframe.exo {
-	flex:1;
-  margin:0;
-  border:none;
-  align-self:stretch;
-	height:100vh;
-}
-div.dev-exo {
-  flex: 1;
-	max-width: 45em;
-	padding: 0.8em;
-	background: white;
-	font-size : 13pt;
-	color: SteelBlue;
-	text-align:center;
-	align-self:center;
-}
+
+/* View mode développement : volet éditeur */
+
 div.dev-volet-editeur {
 	flex:1.6;
 	display:flex;
@@ -108,8 +89,8 @@ div.dev-menu {
 div.editeur {
 	height:100%;
 	background: White;
-  border-top:2px solid Black;
-  border-right:2px solid Black;
+  border-top:1px solid Black;
+  border-right:1px solid Black;
 }
 button.dev-onglet, button.dev-onglet-sel {
 	border:none;
@@ -125,37 +106,72 @@ button.dev-onglet-sel {
   border-top:2px solid Black;
 }
 
-
-button.dev-titre {
-	font-size:13pt;
-	color:white;
+button.dev-titre { /* titre de l'exo */
+	font-size:14pt;
+  border:none;
+  color:white;
 	background:inherit;
-	border:none;
-  padding: 7px
+  padding: 3px 5px;
+  margin: 0px 0px 10px 10px;
 }
 
-.input, .cible, .source, .contenu, .cibleOK, .cibleNotOK {
+/* View mode développement : volet preview exo */
+
+iframe.exo {
+	flex:1;
+  margin:0;
+  border:none;
+  align-self:stretch;
+	height:100vh;
+}
+
+/* Les exos */
+
+.form-enonce { /* l'exo lui-même */
+  display: inline-block;
+  margin-left: 5em;
+	text-align:left;
+  font-size: 12pt;
+}
+.validation-enonce {  /* le bandeau du bouton validation */
+	font-size: 1em;
+	padding: 0.3em;
+	margin-top: 1em;
+	background: WhiteSmoke;
+	border-bottom: 1px solid LightGrey;
+	text-align:right;
+}
+.feedback  {  /* le div qui contient le feedback après correction */
+	font:  italic  bold 1em  Georgia,serif;
+	margin:0;
+	padding:0.5em;
+	text-align:center;
+	height:2em;
+}
+
+/* Les champs input */
+.input, .cible, .source, .drag-contenu, .cibleOK, .cibleNotOK {
 	border : 2px solid Black;
 	border-radius:8px;
-	font-family: 'Montserrat', sans-serif;
-	font-size: 11pt;
+	font-style: italic;
+	font-size: 12pt;
 	color:black;
 	width: auto;
 	}
 
-div.cible, div.source, div.cibleOk, div.cibleNotOk {
-   	display: inline-flex;
-   	border:none;
+div.cible, div.source, div.cibleOk, div.cibleNotOk { /* les divs qui contiennent les champs drag-drop */
+  display: inline-flex;
+  border:none;
 	width: 10em;
 	height: auto;
 	margin : 6px;
-    	vertical-align:top;
+  vertical-align:top;
 	justify-content: center;
 	align-items: center;
 	text-align:center;
 }
 div.cible  {
-	background:LightCyan;
+	background:AntiqueWhite;
 }
 div.cibleOk {
 	background:LightGreen;
@@ -164,9 +180,9 @@ div.cibleNotOk  {
 	background:LightPink;
 }
 div.source  {
-	background:LightBlue;
+	background:Burlywood;
 }
-.contenu {
+.drag-contenu {
 	display:flex;
 	position:absolute;
 	background:inherit;
@@ -183,38 +199,3 @@ span.bonne_reponse {
 span.mauvaise_reponse {
 	background:LightPink;
 }
-
-
-.form-enonce {
-  display: inline-block;
-  margin-left: 5em;
-	text-align:left;
-}
-.validation-enonce {
-	font-size: 1em;
-	padding: 0.3em;
-	margin-top: 1em;
-	background: WhiteSmoke;
-	border-bottom: 1px solid LightGrey;
-	text-align:right;
-}
-.feedback  {
-	font:  italic  bold 1em  Georgia,serif;
-	margin:0;
-	padding:0.5em;
-	text-align:center;
-	height:2em;
-}
-
-
-.form    { font-size: 0.9em; }
-.entries        { list-style: none; margin: 0; padding: 0; }
-.entries li     { margin: 0.8em 1.2em; }
-.entries li h2{ margin-left: -1em; }
-.add-entry   { font-size: 0.9em; border-bottom: 1px solid LightGrey; }
-.add-entry dl{ font-weight: bold; }
-.metanav     { text-align: right; font-size: 0.8em; padding: 0.3em;
-                  margin-bottom: 1em; background: #fafafa; }
-.flash           { background: #cee5F5; padding: 0.5em;
-                  border: 1px solid #aacbe2; }
-.error           { background: #f0d6d6; padding: 0.5em; }
