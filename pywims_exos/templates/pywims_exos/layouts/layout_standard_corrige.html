@@ -1,0 +1,31 @@
+{% extends 'pywims_exos/layout_appli.html' %}
+{% load input_fields_for_corrige %}
+
+{% block contenu %}
+<script>
+$( document ).ready(function(){
+	if(window.top != window.self) {
+		$('#home-link').remove();
+	}
+});
+</script>
+
+<div class = 'titre'>
+	<h1>PyWims, corrigé</h1>
+	<a id='home-link' href="/" class="glyph"><span class="glyphicon glyphicon-home"></span></a>
+</div>
+
+<div class='exo'>
+	<form action="{% url 'run_exo' pk=pk %}" method="post" autocomplete = "off">
+		<div class='form-enonce'>
+			{% block enonce_exo %}{% endblock %}
+		</div>
+
+		<div class = validation-enonce> <input class = 'input' type=submit value=Recommencer> </div>
+	</form>
+
+	<div class='feedback'>
+		{% block feedback %}{% endblock %}
+	</div>
+</div>
+{% endblock %}

@@ -1,8 +1,13 @@
 from django.db import models
+from django.conf import settings
+from django.template import Template, Context
+import os
+
 from sympy import *
 from random import *
 import  math
 from .fonctions import *
+from django.core.files import File
 
 
 def execution(code_string, dictionnaire):
@@ -21,12 +26,39 @@ def execution(code_string, dictionnaire):
 # Create your models here.
 
 class Exo(models.Model):
+	# les fichiers layout pour chaque type d'exo
+	layouts_enonce = {'STD': 'layout_standard.html', 'GGB': 'layout_geogebra.html'}
+	layouts_corrige = {'STD': 'layout_standard_corrige.html', 'GGB': 'layout_geogebra_corrige.html'}
+	# les types d'exos
+	EXO_LAYOUTS = (('STD', 'Standard'),	('GGB', 'Geogebra'))
+
+	layout = models.CharField(max_length=3, choices=EXO_LAYOUTS, default = 'STD')
 	author = models.ForeignKey('auth.User')
 	title = models.CharField(max_length=200)
-	avant = models.TextField('')
-	enonce = models.TextField('')
-	apres = models.TextField('')
-	reponse = models.TextField('')
+	# layout de l'exo. Pour l'instant 'standard' ou 'geogebra', renvoie à un fichier dans LAYOUTS_DIRECTORY
+	ggb_file = models.FileField(upload_to = 'ggb_files', blank = True, default = '')
+	# contient le code Python exécuté avant le rendu de l'exo. En particulier génère les
+	# éléments 'random' de l'exo.
+	avant = models.TextField(blank = True, default = '')
+	# Pour les exos geogebra, contient les commandes de construction, utile pour les parties random
+	# de la construction, et pour définir les variables que retourne l'applet geogebra en guise d'input.
+	ggb_commands = models.TextField(blank = True, default = '')
+	# Template qui décrit le formulaire de l'exo, les champs réponse.
+	enonce = models.TextField(blank = True, default = '')
+	# Code Python exécuté après validation du formulaire. Décide si c'est juste ou faux
+	# et définit le feedback
+	apres = models.TextField(blank = True, default = '')
+	# Template qui affiche le feedback.
+	reponse = models.TextField(blank = True, default = '')
+
+	def layout_enonce(self): # renvoie le nom du fichier layout_enonce
+		print(self.layouts_enonce)
+		print('\n'+'self.layout' + self.layout +'\n')
+		print(self.layouts_enonce[self.layout])
+		return settings.LAYOUTS_DIRECTORY+'/'+self.layouts_enonce[self.layout]
+
+	def layout_corrige(self): # renvoie le nom du fichier layout_corrige
+		return settings.LAYOUTS_DIRECTORY+'/'+self.layouts_corrige[self.layout]
 
 	def exec_avant(self, dictionnaire):
 		return execution(self.avant, dictionnaire)
@@ -35,6 +67,9 @@ class Exo(models.Model):
 		# On ajoute comme variable le dictionnaire 'ok_answer', qui peut ête renseigné dans le corrigé
 		dictionnaire['ok_answer'] = {}
 		return execution(self.apres, dictionnaire)
+	# renvoie les commandes geogebra avec les variables python remplacées par leurs valeurs
+	def exec_ggb(self, dictionnaire):
+		return Template(self.ggb_commands).render(Context(dictionnaire))
 
 	def assign(self, object):
 	# permet de copier dans l'exo une variable python.
@@ -43,7 +78,9 @@ class Exo(models.Model):
 
 	def json(self):
 		return {'pk': self.pk, 'title': self.title, 'avant': self.avant,
-		'enonce': self.enonce, 'apres': self.apres, 'reponse': self.reponse}
+		'layout_enonce': self.layout_enonce(), 'layout_corrige': self.layout_corrige(),
+		'ggb_commands': self.ggb_commands, 'enonce': self.enonce,
+		'apres': self.apres, 'reponse': self.reponse}
 
 	def __str__(self):
 		return self.title

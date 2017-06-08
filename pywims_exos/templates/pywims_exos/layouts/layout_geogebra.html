@@ -1,0 +1,94 @@
+{# TODO : Créer le layout pour le corrigé #}
+{# TODO:  dans layout_mode_dev créer un onglet pour les commandes ggb #}
+{# TODO:  permettre d'uploader un fichier .ggb pour l'exo. #}
+{# TODO:  dans layout_mode_dev, permettre l'édition du fichier.ggb #}
+
+
+{% extends 'pywims_exos/layout_appli.html' %}
+{% load json_filter %}
+{% load static %}
+
+
+{% block contenu %}
+<script type="text/javascript" src="https://cdn.geogebra.org/apps/deployggb.js"></script>
+<script type="text/javascript">
+	var parameters = {
+		"prerelease":false,
+		"width":600,
+		"height":400,
+		"showToolBar":false,
+		"borderColor":null,
+		"showMenuBar":false,
+		"showAlgebraInput":false,
+ 		"showResetIcon":false,
+//		"enableLabelDrags":false,
+		"enableShiftDragZoom":true,
+		"enableRightClick":false,
+		"capturingThreshold":null,
+		"showToolBarHelp":false,
+ 		"errorDialogsActive":true,
+//		"useBrowserForJS":true,
+ 		"filename":"{{ ggb_file.url }}"
+	};
+
+	parameters.appletOnLoad = function() {
+		ggbApplet.evalCommand({{ ggb_commands|tojson }});
+	}
+	var applet = new GGBApplet('5.0', parameters);
+
+	// fonction appelée quand le formulaire est soumis
+	function ggbSubmit() {
+		// remplit les champs 'ggb_input_??' par une valeur obtenue de l'applet geogebra
+		$("input[id^=ggb_input_]").each(function() {
+			$(this).val(ggbApplet.getValue($(this).attr('id').slice(10)));
+		});
+		// sauvegarde l'état de l'applet geogebra dans le champ input "ggb_applet_state"
+		$( "#ggb_applet_state" ).val(ggbApplet.getBase64());
+	}
+
+	// exécute les commands géogébra de l'exo.
+	/*function ggbOnInit() {
+		ggbApplet.evalCommand({{ ggb_commands|tojson }});
+	}*/
+	// remplit les champs 'ggb_input_??' par une valeur obtenue de l'applet geogebra
+	function submitGgbValues() {
+		$("input[id^=ggb_input_]").each(function() {
+			$(this).val(ggbApplet.getValue($(this).attr('id').slice(10)));
+		});
+	}
+
+	//when used with Math Apps Bundle, uncomment this:
+	//applet.setHTML5Codebase('GeoGebra/HTML5/5.0/webSimple/');
+
+$( document ).ready(function(){ // enlève le bouton 'Home' si l'exo est inclus dans une autre page
+	if(window.top != window.self) { // il faudrait probablement faire ça autrement
+		$('#home-link').remove();
+	}
+	applet.inject('ggb_applet_container', 'preferHTML5');
+});
+</script>
+
+<div class = 'titre'>
+	<h1>PyWims, énoncé</h1>
+	<a id='home-link' href="/" class="glyph"><span class="glyphicon glyphicon-home"></span></a>
+</div>
+
+<div id='ggb_applet_container'>
+</div>
+
+
+<div class='exo'>
+	<form action="{% url 'corrige_exo' pk=pk %}"
+				id = "form_exo"
+				method="post"
+				autocomplete = "off"
+				onsubmit="ggbSubmit()">
+		<input type = 'hidden' name = 'ggb_applet_state' id = 'ggb_applet_state'/>
+		<div class='form-enonce'>
+			{% block enonce_exo %}{% endblock %}
+		</div>
+
+		<div class = validation-enonce> <input class = 'input' type=submit value=Valider> </div>
+	</form>
+</div>
+{% endblock %}

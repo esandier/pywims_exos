@@ -55,6 +55,10 @@ def input_drag(context, name, display, **kwargs):
     return {'name': name, 'display': display, 'style_boite': style_boite_string,
     'style_contenu': style_contenu_string, 'drag_it': drag_it, 'destination': destination}
 
+@register.inclusion_tag('pywims_exos/input_ggb_for_corrige.html')
+def input_ggb(name_python, name_ggb):
+    return {'name_python': name_python, 'name_ggb': name_ggb}
+
 @register.inclusion_tag('pywims_exos/input_drop_for_corrige.html', takes_context=True)
 def input_drop(context, name, display, **kwargs):
     if 'style_contenu' in kwargs:

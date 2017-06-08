@@ -17,11 +17,12 @@ $( document ).ready(function(){
  editor.setAutoScrollEditorIntoView(true);
  editor.resize();
 
+ if (status.exo['layout'].indexOf('geogebra') == -1) $( "#ggb_commands_button" ).hide();
+
  $( "#"+status['current_code']+"_button").attr('class', 'dev-onglet-sel');
 
  $( "#preview_button, #home_button" ).click(function() {
-   status.exo[status['current_code']] = editor.getValue();status.exo['enonce']
-   console.log(status.exo['enonce'])
+   status.exo[status['current_code']] = editor.getValue();
    // on enlève '_button' au nom du bouton pour obtenir l'action requise
    status['requested_action'] = this.id.slice(0, -7);
    $.ajax({
@@ -30,7 +31,7 @@ $( document ).ready(function(){
      data: JSON.stringify(status, null, '\t'),
      contentType: 'application/json;charset=UTF-8',
      success: function(returned_status) {
-       status = returned_status
+       status = returned_status;
        if (status['requested_action'] == 'preview')
        document.getElementById('frame_exo').contentWindow.location.reload();
        if (status['requested_action'] == 'home')
@@ -39,7 +40,7 @@ $( document ).ready(function(){
    });
  });
 
- $( "#avant_button, #apres_button, #enonce_button, #reponse_button" ).on( "click", function() {
+ $( "#avant_button, #apres_button, #enonce_button, #reponse_button, #ggb_commands_button" ).on( "click", function() {
    $( "#"+status['current_code']+"_button").attr('class', 'dev-onglet');
    status.exo[status['current_code']] = editor.getValue();
    // on enlève '_button' au nom du bouton pour obtenir la partie du code à afficher
@@ -52,7 +53,45 @@ $( document ).ready(function(){
    editor.getSession().setMode("ace/mode/"+ status['langage']);
    $( "#"+status['current_code']+"_button").attr('class', 'dev-onglet-sel');
  });
+
+ // rendre le titre de l'exo modifiable
+ $( "#titre-pencil" ).on( "click", function() {
+    if ($( "#titre" ).attr('contentEditable') != 'true') {
+      $( "#titre" ).attr('contentEditable', 'true');
+      $( "#titre" ).css({"border-color": "#white",
+             "border-width":"1px",
+             "border-style":"solid"});
+    }
+    $( "#titre" ).focus();
+  });
+
+  $( "#titre" ).bind('keypress', function(e) {
+    var code = e.keyCode || e.which;
+
+    if ((code == 13) || (code == 27)) {
+      $( "#titre" ).attr('contentEditable', 'false');
+      $( "#titre" ).css({'border': 'none'});
+    }
+
+    if (code == 13) {  // touche enter : on enregistre le nouveau titre
+      status.exo['title'] = $( "#titre" ).html();
+      status['requested_action'] = 'new-title';
+      console.log(status);
+      $.ajax({
+        type : "POST",
+        url : "{% url 'dev_exo' pk=pk %}",
+        data: JSON.stringify(status, null, '\t'),
+        contentType: 'application/json;charset=UTF-8',
+        success: function(returned_status) {}
+      });
+    }
+    // touche escape : on revient au titre initial
+    if (code == 27) $( "#titre" ).html(status.exo['title']);
+  });
+
 });
+
+
 </script>
 
 <div class = 'dev_exos'>
@@ -60,8 +99,10 @@ $( document ).ready(function(){
     <div class='dev-menu'>
       <div  style = 'display:inline-block'>
           <button class = 'dev-titre' type="button" id = 'titre'> {{ status.exo.title }} </button>
+          <button class = 'dev-titre' id = 'titre-pencil'><span class="glyphicon glyphicon-pencil"></span></button>
           <br>
           <button class = 'dev-onglet' type="button" id = 'avant_button'> Avant </button>
+          <button class = 'dev-onglet' type="button" id = 'ggb_commands_button'> Géogebra </button>
           <button class = 'dev-onglet' type="button" id = 'enonce_button'> Enoncé </button>
           <button class = 'dev-onglet' type="button" id = 'apres_button'> Après </button>
           <button class = 'dev-onglet' type="button" id = 'reponse_button'> Réponse </button>

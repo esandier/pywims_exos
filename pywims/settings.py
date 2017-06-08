@@ -14,6 +14,8 @@ import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+LAYOUTS_DIRECTORY = os.path.join(BASE_DIR, 'pywims_exos/templates/pywims_exos/layouts')
+print(LAYOUTS_DIRECTORY)
 
 
 # Quick-start development settings - unsuitable for production
@@ -66,6 +68,7 @@ TEMPLATES = [
         },
     },
 ]
+
 
 WSGI_APPLICATION = 'pywims.wsgi.application'
 
@@ -121,3 +124,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+MEDIA_ROOT = BASE_DIR
+MEDIA_URL = '/media/'
+print(LAYOUTS_DIRECTORY+'\n')
+print(MEDIA_ROOT+'\n')

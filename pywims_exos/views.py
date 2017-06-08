@@ -15,7 +15,7 @@ from .fonctions import *
 # Des champs de formulaire de type 'input' sont définis pour offrir une interface sympa
 # la définition est dans le fichiers input_fields.py, qui réfère à un template par champ
 en_tete_exo = """
-{% extends "pywims_exos/exo_enonce.html" %}
+{% extends "exo_enonce.html" %}
 {% load input_fields %}
 {% block enonce_exo %}
 """
@@ -69,8 +69,15 @@ def run_exo(request, pk):
 	contexte = for_template(dictionnaire)
 	# on ajoute la primary key de l'exo, utilisée quand on redirige vers la vue 'corrigé'
 	contexte['pk'] = pk
+	# Intégration géogebra.
+	if (exo.layout == 'GGB') :
+		contexte['ggb_commands'] = exo.exec_ggb(dictionnaire)
+		contexte['ggb_file'] = exo.ggb_file
 
-	return HttpResponse(Template(en_tete_exo + exo.enonce + fin_exo).render(Context(contexte)))
+	string = "{% extends '" + exo.layout_enonce() + "' %}\n {% load input_fields %}\n"\
+		+ '{% block enonce_exo %}\n'+ exo.enonce + '\n{% endblock %}'
+	# return HttpResponse(Template(en_tete_exo + exo.enonce + fin_exo).render(Context(contexte)))
+	return HttpResponse(Template(string).render(Context(contexte)))
 
 def corrige_exo(request, pk):
 	# Les données récupérées après l'exécution de 'avant'. Il faut les récupérer dans un contexte
@@ -78,20 +85,21 @@ def corrige_exo(request, pk):
 	with evaluate(False):
 		dictionnaire = request.session['current_exo_dict']
 
-	#print('dictionnaire 2', dictionnaire, '\n\n')
 	reverse_form = {}
 	form_data = {}
 
 	# on ajoute au dictionnaire les données de formulaire, que l'on conserve séparément
 	# On garde aussi un dictionnaire inversé des données de formulaire, utile pour l'affichage des
 	# champs drag-drop
+
 	for v in request.POST :
 		dictionnaire[v] = request.POST[v]
+		# données de formulaire conservée parce que le code 'après' peut modifier le dictionnaire
 		form_data[v] = request.POST[v]
 		reverse_form[request.POST[v]] = v
 
 	exo = get_object_or_404(Exo, pk=pk)
-	# on ajoute au dictionnaire les données récupérées suite à l'exécution de 'après'
+	# on ajoute/modifie des données au dictionnaire par l'exécution de 'après'
 	dictionnaire = exo.exec_apres(dictionnaire)
 
 	ok_answers = dictionnaire['ok_answer']
@@ -100,13 +108,17 @@ def corrige_exo(request, pk):
 	contexte['reverse_form_data'] = reverse_form
 	contexte['answer_data'] = ok_answers
 	contexte['pk'] = pk
+	string = "{% extends '" + exo.layout_corrige() + "' %}\n {% load input_fields_for_corrige %}\n"\
+	+ '{% block enonce_exo %}\n'+ exo.enonce + '\n{% endblock %}'\
+	+ '{% block feedback %}\n' + exo.reponse + '\n{% endblock %}'
+	return HttpResponse(Template(string).render(Context(contexte)))
 
-	return HttpResponse(
-		Template(en_tete_corrige + exo.enonce + fin_exo + en_tete_reponse + exo.reponse + fin_reponse)
-			.render(Context(contexte))
-	)
+#	return HttpResponse(
+#		Template(en_tete_corrige + exo.enonce + fin_exo + en_tete_reponse + exo.reponse + fin_reponse)
+#			.render(Context(contexte))
 
-def dev_exo(request, pk):# TODO : affiche la page de développement
+
+def dev_exo(request, pk):#  affiche la page de développement
 
 	if (request.method == 'GET') and (pk != 0):
 		exo = get_object_or_404(Exo, pk=pk)
@@ -117,7 +129,9 @@ def dev_exo(request, pk):# TODO : affiche la page de développement
 		print('POST')
 		status = json.loads(request.body.decode())
 
-		if (status['requested_action'] == 'preview') or (status['requested_action'] == 'home'):
+		if (status['requested_action'] == 'preview') or	\
+		(status['requested_action'] == 'home') or \
+		 (status['requested_action'] == 'new-title'):
 			print('PREVIEW')
 			exo = get_object_or_404(Exo, pk=status['exo']['pk'])
 			exo.assign(status['exo'])

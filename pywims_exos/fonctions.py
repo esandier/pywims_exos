@@ -25,6 +25,7 @@ def is_equal(a, b):
     if (a == False) or (b == False) : return False # il y a eu echec de conversion sur a ou b
     else : return  simplify(a-b) == 0
 
+
 def for_template(arg):
 # renvoie arg dans un bon format pour l'affichage dans un template html avec mathjax. Si arg est une liste, s'applique récursivement aux éléments de arg.
     if ('sympy' in str(type(type(arg)))) or  ('sympy' in str(type(arg))): # selon les cas 'sympy' n'est pas dans type(arg), mais dans type(type(arg)). C'est de la cuisine.

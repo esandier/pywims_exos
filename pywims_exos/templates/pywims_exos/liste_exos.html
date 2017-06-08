@@ -14,7 +14,7 @@ $( document ).ready(function(){
 
 	$( "#item-add" ).bind('keypress', function(e) {
 		var code = e.keyCode || e.which;
-		if (code == 13) {
+		if (code == 13) { // touche enter : on enregistre le nouvel exo
 			var title = $( this ).val()
 			var status = {'requested_action':'new', 'title': title};
 			console.log(status);
@@ -28,12 +28,16 @@ $( document ).ready(function(){
 				}
 			});
 		}
+		if (code == 27) { // touche escape : on annulle l'ajout d'exo
+			$( "#item-add-div" ).toggle();
+			$( "#item-add" ).val('');
+		}
 	});
 });
 </script>
 
 <div class = 'titre'>
-	<h1><a href="/">Liste des exos PyWims</a></h1>
+	<h1>Liste des exos PyWims</h1>
 	<button id = 'plus_button' class="glyph"><span class="glyphicon glyphicon-plus"></span></button>
 </div>
 

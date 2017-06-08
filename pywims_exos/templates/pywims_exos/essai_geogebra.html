@@ -1,4 +1,5 @@
-<!doctype html>
+ <meta charset="utf-8">
+ <html>
 <head>
 <title>Essai Geogebra</title>
 
@@ -13,33 +14,44 @@
   });
 </script>
 
-<script type="text/javascript" src="static/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML-full"></script>
-
+<script type="text/javascript"
+src="https://cdn.rawgit.com/mathjax/MathJax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 
+
 <script type="text/javascript" src="http://www.geogebratube.org/scripts/deployggb.js"></script>
-<script type="text/javascript">
-var applet1 = new GGBApplet({filename: "geogebra-applet.ggb", width:500, height:500}, true);
-window.onload = function() {
-        applet1.inject('applet_container1', 'preferHTML5');
-    }
 
-function getCoords(objName) {
-  var applet = document.ggbApplet;
-  var x = applet.getXcoord(objName);
-  var y = applet.getYcoord(objName);
+<script>
+$( document ).ready(function(){
+  var applet = new GGBApplet({filename: "trois ensembles.ggb", width:500, height:500}, true);
+  applet.inject('applet_container1', 'preferHTML5');
 
-  document.coordForm.getXfield.value = x;
-  document.coordForm.getYfield.value = y;
-}
+ $( "#bouton" ).click(function() {
+   document.ggbApplet.evalCommand('dansA = IsInRegion[P,A]');
+   var dansA = document.ggbApplet.getValue('dansA');
+   document.ggbApplet.evalCommand('dansB = IsInRegion[P,B]');
+   var dansB = document.ggbApplet.getValue('dansB');
+   document.ggbApplet.evalCommand('dansC = IsInRegion[P,C]');
+   var dansC = document.ggbApplet.getValue('dansC');
+   if (dansB && dansC && !dansA) $( "#resultat" ).html('Bravo !!');
+   else $( "#resultat" ).html('Raté :(');
+  });
+});
 </script>
+
+
+
 </head>
 
 <body>
 
-l'applet geogebra
+Dans la figure ci-dessous, déplacez le point $P$ dans la région $(B\cap C)\setminus A$, puis appuyez
+<button style = 'border : 1 px solid black' type="button" id = 'bouton'> Ici </button>
+
 <div id="applet_container1" style = 'border:1px solid red'></div>
-est ici
+
+<button style = 'border : 1 px solid black' type="button" id = 'resultat'> Résultat </button>
+
 
 </body>
-
