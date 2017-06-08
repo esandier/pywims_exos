@@ -78,7 +78,7 @@ class Exo(models.Model):
 
 	def json(self):
 		return {'pk': self.pk, 'title': self.title, 'avant': self.avant,
-		'layout_enonce': self.layout_enonce(), 'layout_corrige': self.layout_corrige(),
+		'layout': self.layout,
 		'ggb_commands': self.ggb_commands, 'enonce': self.enonce,
 		'apres': self.apres, 'reponse': self.reponse}
 

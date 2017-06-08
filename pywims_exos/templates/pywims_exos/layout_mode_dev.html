@@ -16,8 +16,8 @@ $( document ).ready(function(){
  document.getElementById('editeur').style.fontSize='14px';
  editor.setAutoScrollEditorIntoView(true);
  editor.resize();
-
- if (status.exo['layout'].indexOf('geogebra') == -1) $( "#ggb_commands_button" ).hide();
+ console.log(status.exo['layout']);
+ if (status.exo['layout'] != 'GGB') $( "#ggb_commands_button" ).hide();
 
  $( "#"+status['current_code']+"_button").attr('class', 'dev-onglet-sel');
 
@@ -102,7 +102,7 @@ $( document ).ready(function(){
           <button class = 'dev-titre' id = 'titre-pencil'><span class="glyphicon glyphicon-pencil"></span></button>
           <br>
           <button class = 'dev-onglet' type="button" id = 'avant_button'> Avant </button>
-          <button class = 'dev-onglet' type="button" id = 'ggb_commands_button'> Géogebra </button>
+          <button class = 'dev-onglet' type="button" id = 'ggb_commands_button'> Geogebra </button>
           <button class = 'dev-onglet' type="button" id = 'enonce_button'> Enoncé </button>
           <button class = 'dev-onglet' type="button" id = 'apres_button'> Après </button>
           <button class = 'dev-onglet' type="button" id = 'reponse_button'> Réponse </button>
