@@ -38,16 +38,20 @@ $( document ).ready(function(){
 
 <div class = 'titre'>
 	<h1>Liste des exos PyWims</h1>
-	<button id = 'plus_button' class="glyph"><span class="glyphicon glyphicon-plus"></span></button>
+	<button id = 'plus_button' class="glyph"><span class="fa fa-plus"></span></button>
 </div>
 
 <div class="content container">
 	<div class="row">
-		<div class="col-md-8"  id = 'liste-exos'>
+		<div class="col"  id = 'liste-exos'>
 			{% for exo in exos %}
 			<div class = 'item-liste'>
-				<a href="{% url 'delete_exo' pk=exo.pk %}" class="list-glyph"><span class="glyphicon glyphicon-trash"></span></a>
-				<a href="{% url 'dev_exo' pk=exo.pk %}" class="list-glyph"><span class="glyphicon glyphicon-pencil"></span></a>
+				<a href="{% url 'form_exo' pk=exo.pk %}" class="list-glyph">
+					<span class="fa fa-bars"></span></a>
+				<a href="{% url 'delete_exo' pk=exo.pk %}" class="list-glyph">
+					<span class="fa fa-trash"></span></a>
+				<a href="{% url 'dev_exo' pk=exo.pk %}" class="list-glyph">
+					<span class="fa fa-pencil"></span></a>
 				<div style = 'display:inline-block'>
 					<a href="{% url 'run_exo' pk=exo.pk %}" class="list-title">
 						<h1>{{ exo.title }}	</h1>
@@ -58,8 +62,9 @@ $( document ).ready(function(){
 			{% endfor %}
 
 			<div id='item-add-div' class = 'item-liste' display='none'>
-				<a class="list-glyph"><span class="glyphicon glyphicon-trash"></span></a>
-				<a class="list-glyph"><span class="glyphicon glyphicon-pencil"></span></a>
+				<a class="list-glyph"><span class="fa fa-bars"></span></a>
+				<a class="list-glyph"><span class="fa fa-trash"></span></a>
+				<a class="list-glyph"><span class="fa fa-pencil"></span></a>
 				<div style = 'display:inline-block'>
 					<input  id='item-add' class='item-liste'>
 					<p> {{ request.user.username }} </p>

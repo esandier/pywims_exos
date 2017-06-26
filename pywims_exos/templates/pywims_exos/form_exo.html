@@ -1,0 +1,11 @@
+{% extends 'pywims_exos/layout_appli.html' %}
+
+{% block contenu %}
+<form action="{% url 'form_exo' pk=pk %}" method="post" enctype='multipart/form-data' autocomplete = "off">
+{% csrf_token %}
+<div class = 'item-liste'> <h1> Type d'exercice : {{ form.layout }}</h1> </div>
+<div class = 'item-liste'> <h1> Fichier geogebra initial : {{ form.ggb_file }}</h1></div>
+<input type="submit" value="Valider" />
+</div>
+</form>
+{% endblock %}

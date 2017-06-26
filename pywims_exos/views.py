@@ -1,10 +1,12 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 from django.template import Template, Context
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 import json
 from .models import Exo
 from .fonctions import *
+from .forms import ExoForm
+from django.core.files import File
 
 #
 #
@@ -123,7 +125,8 @@ def dev_exo(request, pk):#  affiche la page de développement
 	if (request.method == 'GET') and (pk != 0):
 		exo = get_object_or_404(Exo, pk=pk)
 		status = {'exo': exo.json(), 'current_code' : 'avant', 'langage' : 'python', 'echo' : exo.title}
-		return render(request, 'pywims_exos/layout_mode_dev.html', {'status': status, 'pk':pk})
+		return render(request, 'pywims_exos/layout_mode_dev.html',\
+		  {'status': status, 'pk':pk, 'LAYOUTS':Exo.EXO_LAYOUTS, 'EMPTY_GGB_FILE':Exo.EXOS_EMPTY_GGB_FILE})
 
 	if request.method == 'POST':
 		print('POST')
@@ -131,12 +134,33 @@ def dev_exo(request, pk):#  affiche la page de développement
 
 		if (status['requested_action'] == 'preview') or	\
 		(status['requested_action'] == 'home') or \
-		 (status['requested_action'] == 'new-title'):
-			print('PREVIEW')
+		 (status['requested_action'] == 'update-title') or\
+		 (status['requested_action'] == 'update-layout'):
+			print('status   ',status)
 			exo = get_object_or_404(Exo, pk=status['exo']['pk'])
+			if (status['exo']['layout'] == "GGB") and (status['requested_action'] == 'update-layout') :
+				f = open(Exo.EXOS_EMPTY_GGB_FILE)
+				print('coucou')
+				exo.ggb_file = File(f)
+				print('au revoir')
+				f.close()
 			exo.assign(status['exo'])
 			exo.save()
 			status['echo']= exo.title
 			return HttpResponse(json.dumps(status), content_type='application/json')
 		else :
 			return HttpResponse(json.dumps(status), content_type='application/json')
+
+# affiche un formulaire pour les données de l'exo autres que le code
+def form_exo(request, pk):
+	exo = get_object_or_404(Exo, pk=pk)
+
+	if request.method == 'POST':
+		# create a form instance and populate it with data from the request:
+		form = ExoForm(request.POST, request.FILES, instance = exo)
+		form.save()
+		return HttpResponseRedirect('/')
+		# if a GET (or any other method) we'll display the form
+	else:
+		form = ExoForm(instance=exo)
+		return render(request, 'pywims_exos/form_exo.html', {'form': form, 'pk':pk})

@@ -23,7 +23,7 @@ div.titre {
 	background-color: #ff9400;
 	margin-top: 0;
   margin-bottom: 20px;
-	padding: 0px 10px 10px 20px;
+	padding: 10px 10px 10px 20px;
 	display:flex;
 	justify-content: space-between;
 }
@@ -57,6 +57,12 @@ div.item-liste h1, input.item-liste {
 	align-self:top;
 }
 
+/* Conteneur de l'applet geogebra */
+
+div.ggb_applet_container{
+  padding-left: 20px;
+}
+
 /* View mode développement: conteneur des deux volets */
 
 div.dev_exos {
@@ -79,19 +85,22 @@ div.dev-volet-editeur {
 	height:100vh;
 	min-width:300px;
 	border-right: 4px solid Plum;
-	}
+}
+
 div.dev-menu {
 	display:flex;
  	background:Plum;
  	font-size: 12px;
 	justify-content: space-between;
 }
+
 div.editeur {
 	height:100%;
 	background: White;
   border-top:1px solid Black;
   border-right:1px solid Black;
 }
+
 button.dev-onglet, button.dev-onglet-sel {
 	border:none;
 	color: black;
@@ -100,16 +109,20 @@ button.dev-onglet, button.dev-onglet-sel {
 	margin: 0px 0px 0px 10px;
 	text-align: center;
 	text-decoration: none;
+  font-family: 'Crete Round', serif;
 	font-size:11pt;
 }
+
 button.dev-onglet-sel {
   border-top:2px solid Black;
 }
 
-button.dev-titre { /* titre de l'exo */
+button.dev-titre, span.dev-titre { /* titre de l'exo */
+  font-family: 'Crete Round', serif;
 	font-size:14pt;
   border:none;
   color:white;
+  white-space: pre; /* nécessaire pour pouvoir enter des espaces */
 	background:inherit;
   padding: 3px 5px;
   margin: 0px 0px 10px 10px;
@@ -198,4 +211,48 @@ span.bonne_reponse {
 }
 span.mauvaise_reponse {
 	background:LightPink;
+}
+
+
+/* Menu développement bootstrap INUTILISE INUTILISE
+.dev_page {
+	background: #eee;
+	height:100vh;
+}
+
+/* View mode développement : volet éditeur
+
+.dev-pane-edit {
+  height:100vh;
+}
+
+.dev-glyphs {
+  font-size:24pt;
+  color:white;
+  padding:10px;
+  }
+
+.dev-title-glyph {
+  margin-left:20px;
+}
+
+.dev-edit {
+	height:100%;
+	background: White;
+  border-right: 4px solid Plum;
+  font-size: 14px;
+}
+.dev-tab-title {
+	color: black;
+	background:Plum;
+	font-size:11pt;
+}
+
+.dev-title { /* titre de l'exo
+	font-size:14pt;
+  color:white;
+  padding:10px;
+}
+.dev-navbar { /* titre de l'exo
+padding-left:10px
 }

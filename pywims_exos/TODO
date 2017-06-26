@@ -1,0 +1,34 @@
+Geogebra :
+	- Pour les champs input, voir si on peut réutiliser les variables geogebra,
+ 	avec le préfixe ggb_ pour éviter les conflits.
+	- Ajouter le traitement de ok_answer: colorie en vert ou en rouge l'objet.
+	- Améliorer le layout: enoncé à gauche, applet à droite.
+
+Corrige :
+	- Explorer une autre façon de faire, où au lieu de recharger une page,
+	on modifie l'existant, ce qui est plus agréable pour l'utilisateur. Au moins
+	pour geogebra qui met des plombes à charger.
+	- Faire de la validation et signaler les inputs incompréhensibles ou ne correspondant
+	pas à ce qui est demandé (nombre ou fraction irreductible, par exemple).
+
+Exo appelable :
+	- Faire qu'un exo puisse être appelé, éventuellement avec un contexte.
+	- Faire que l'exo renvoie un contexte. Possibilité de définir ce contexte dans l'exo.
+
+Hyperliens définition :
+	- Possibilité qu'un terme utilisé dans l'exo (matrice, dérivée, ...) puisse être un hyperlien,
+	le dictionnaire ne devant pas nécessairement être défini par l'auteur, mais pouvant l'être.
+
+Mode dev :
+	- Pour le titre éditable : utiliser un champ input, contenteditable déconne avec Chrome.
+	- Compléter : Si le type de l'exo est modifié en Geogebra, demander un fichier à uploader
+	- Ajouter un onglet formulaire avec les paramètres et métadonnées de l'exo.
+	permettre d'uploader des fichiers associés à l'exo.
+	- Ajouter un onglet par fichier associé à l'exo, qui appelle dans le volet éditeur
+	un éditeur approprié pour le fichier.
+	- Peut-être traiter 'avant, 'apres', ... comme des fichiers plutôt que des champs
+	texte?
+
+Général :
+	- Améliorer la sécurité. Limiter les keywords Python utilisables. Interdire
+	javascript dans les templates, etc...

@@ -1,0 +1,133 @@
+{% extends 'layout.html' %}
+{% block js_imports %}
+<link href="//fonts.googleapis.com/css?family=Lobster&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=Crete+Round&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+<link rel="stylesheet" href="{% static 'css/pywims_exos.css' %}">
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+	tex2jax: {
+		inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+		displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+		processEscapes: true,
+	},
+	menuSettings: { inTabOrder : false }
+});
+</script>
+<script type="text/javascript"
+src="https://cdn.rawgit.com/mathjax/MathJax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+{% endblock %}
+
+{% block javascript  %}
+<script>
+function allowDrop(ev) {
+	ev.preventDefault();
+}
+function drag(ev) {
+	ev.dataTransfer.setData("text", ev.target.id);
+}
+function drop(ev, target) // target est l'id de la source du drop
+{
+	ev.preventDefault();
+
+	if (!ev.target.getAttribute("ondrop")) return false;
+	// data est l'id de la cible du drop
+	var data=ev.dataTransfer.getData("text");
+	// Le drop
+	document.getElementById(target).appendChild(document.getElementById(data));
+	// Renseignement de la variable via un champ "input" caché, dont l'id est
+	// celle le la cible, préfacée par 'input_'
+	var input=document.getElementById('input_'+data);
+	if (target != undefined) input.value = target;
+	else input.value = '';
+}
+function on_update(field_data)
+{
+}
+function on_validate(field_status, feedback)
+{
+}
+</script>
+{% endblock %}
+	statement = """
+{% block statement %}{% endblock %}
+"""
+	feedback = """
+{% block feedback %}{% endblock %}
+"""
+	footer = """
+{% endblock content %}
+	"""
+	template_structure = ['header','js_libs','javascript','layout','statement',\
+	'feedback','footer']
+
+
+	def __init__(self, file):
+
+		self.blocks = file.read_blocks()
+		# Builds the template. In this case the blocks are in sequence, but one could
+		# imagine making template_structure a tree, which would require a more
+		# complex builder than a loop.
+		self.parent_template = ""
+		for block_name in self.template_structure:
+			self.parent_template += self.blocks[block_name]
+
+		# wraps statement and feedback blocks in "block" tags that are called in the template layout
+		self.template = """
+{% extends 'parent_template.html' %}
+{% block statement %}
+		""" + statement + """
+{% endblock %}
+{% block feedback %}
+""" + feedback + """
+{% endblock %}
+"""
+			# The dictionary available to code blocks.
+		self.dict = {'exercise_solved': None, 'field_status':None}
+
+	def build(self, seed = None, dict = None):
+		# seed random generator
+		random.seed(seed)
+		# The "build" code block is executed with its header. This returns the
+		# dictionary of variables defined in the block.
+		# The dictionary returned by exec is stored in self.dict.
+		self.dict = execute(
+			self.code_headers['build']+self.code_blocks['build'],
+			dict = {})
+		# The provided dictionary overwrites self.dict
+		self.dict.assign(dict)
+		#  A version of self.dict
+		# formatted for the template is returned.
+		return(for_template(self.dict))
+
+	def grade(template_data):
+		# populate self.dict with python translation of template_data
+		# template data is a dict of dicts. Each entry is of the form
+		# input_field_name : {type: field_type, value : field_value}
+		assign(self.dict, for_code(template_data)) # l'équivalent de "assign" existe dans PL, je me rappelle plus le nom
+		# Executes grade code_block which must define "exercise_solved", a bool destined to the
+		# learning system and "grade_for_template" a dictionary destined to the template, telling it which fields are OK or Not
+		self.dict = execute(self.code_headers['grade']+self.code_blocks['grade'], self.dict)
+		self.grade_for_LS = {'exercise_solved': self.dict['exercise_solved']}
+		self.grade_for_template = self.dict[field_status]
+		self.feedback_block = render_template(self.feedback, self.dict)
+
+	def update_feedback(template_data):
+		# if for_code cannot interpret a value, it will be written as NOT_RECOGNIZED
+		# or WRONG_TYPE in the result, so the template will know
+		return for_code(template_data)
+
+	def execute(code_string, dictionnaire):
+	# execute le code python contenu dans "code_string", après avoir renseigné les variables présentes dans 'dictionnaire',
+	# puis renvoie un dictionnaire de toutes les variables locales (définies dans 'dictionnaire' et définies par 'code_string')
+	# A REMPLACER PAR L'EQUIVALENT PL
+		class Code:
+			def __init__(self, dictionnaire):
+				for v in dictionnaire : exec(v+'=dictionnaire["'+v+'"]')
+				exec(code_string)
+				self.variables = locals()
+				del self.variables['dictionnaire'], self.variables['self'], self.variables['code_string']
+
+		code = Code(dictionnaire)
+		return code.variables

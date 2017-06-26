@@ -126,5 +126,3 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_ROOT = BASE_DIR
 MEDIA_URL = '/media/'
-print(LAYOUTS_DIRECTORY+'\n')
-print(MEDIA_ROOT+'\n')

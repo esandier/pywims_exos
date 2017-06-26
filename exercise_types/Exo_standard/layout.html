@@ -1,5 +1,6 @@
 {% extends 'pywims_exos/layout_appli.html' %}
-{% load input_fields_for_corrige %}
+
+{% load input_fields %}
 
 {% block contenu %}
 <script>
@@ -11,21 +12,17 @@ $( document ).ready(function(){
 </script>
 
 <div class = 'titre'>
-	<h1>PyWims, corrigé</h1>
+	<h1>PyWims, énoncé</h1>
 	<a id='home-link' href="/" class="glyph"><span class="fa fa-home"></span></a>
 </div>
 
 <div class='exo'>
-	<form action="{% url 'run_exo' pk=pk %}" method="post" autocomplete = "off">
+	<form action="{% url 'corrige_exo' pk=pk %}" id = "form_exo" method="post" autocomplete = "off">
 		<div class='form-enonce'>
 			{% block enonce_exo %}{% endblock %}
 		</div>
 
-		<div class = validation-enonce> <input class = 'input' type=submit value=Recommencer> </div>
+		<div class = validation-enonce> <input class = 'input' type=submit value=Valider> </div>
 	</form>
-
-	<div class='feedback'>
-		{% block feedback %}{% endblock %}
-	</div>
 </div>
 {% endblock %}

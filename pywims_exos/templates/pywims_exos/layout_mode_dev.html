@@ -7,6 +7,7 @@
 <script src="https://ajaxorg.github.io/ace-builds/src/ace.js" type="text/javascript" charset="utf-8"></script>
 <script>
 $( document ).ready(function(){
+  $( "#apres" ).toggle();
  var editor = ace.edit("editeur");
  var status = {{ status|tojson }};
  editor.setTheme("ace/theme/tomorrow");
@@ -16,7 +17,6 @@ $( document ).ready(function(){
  document.getElementById('editeur').style.fontSize='14px';
  editor.setAutoScrollEditorIntoView(true);
  editor.resize();
- console.log(status.exo['layout']);
  if (status.exo['layout'] != 'GGB') $( "#ggb_commands_button" ).hide();
 
  $( "#"+status['current_code']+"_button").attr('class', 'dev-onglet-sel');
@@ -38,6 +38,25 @@ $( document ).ready(function(){
        window.location.replace("{% url 'liste_exos' %}");
      }
    });
+ });
+
+ $( "#layout_select" ).val(status.exo.layout);
+ $( "#layout_select" ).on( "change" , function() {
+   status['requested_action'] = "update-layout";
+   console.log(".val" + $( this ).val());
+   status.exo['layout'] = $( this ).val();
+   console.log(".val" + $( this ).val());
+   $.ajax({
+     type : "POST",
+     url : "{% url 'dev_exo' pk=pk %}",
+     data: JSON.stringify(status, null, '\t'),
+     contentType: 'application/json;charset=UTF-8',
+     success: function(returned_status) {
+       status = returned_status;
+     }
+   });
+ });
+ $( "#ggb_file_button" ).on( "click", function() {
  });
 
  $( "#avant_button, #apres_button, #enonce_button, #reponse_button, #ggb_commands_button" ).on( "click", function() {
@@ -75,8 +94,7 @@ $( document ).ready(function(){
 
     if (code == 13) {  // touche enter : on enregistre le nouveau titre
       status.exo['title'] = $( "#titre" ).html();
-      status['requested_action'] = 'new-title';
-      console.log(status);
+      status['requested_action'] = 'update-title';
       $.ajax({
         type : "POST",
         url : "{% url 'dev_exo' pk=pk %}",
@@ -88,7 +106,6 @@ $( document ).ready(function(){
     // touche escape : on revient au titre initial
     if (code == 27) $( "#titre" ).html(status.exo['title']);
   });
-
 });
 
 
@@ -99,8 +116,17 @@ $( document ).ready(function(){
     <div class='dev-menu'>
       <div  style = 'display:inline-block'>
           <button class = 'dev-titre' type="button" id = 'titre'> {{ status.exo.title }} </button>
-          <button class = 'dev-titre' id = 'titre-pencil'><span class="glyphicon glyphicon-pencil"></span></button>
+          <button class = 'dev-titre' id = 'titre-pencil'><span class="fa fa-pencil"></span></button>
           <br>
+          <button class = 'dev-onglet' type='button' id = 'layout_button'> Type:</button>
+          <select id = "layout_select" >
+            {% for first, second in LAYOUTS %}
+            <option value='{{ first }}'> {{ second }} </option>
+            {% endfor %}
+          </select>
+          <button class = 'dev-onglet' type="button" title = "charger la construction initiale depuis un fichier .ggb" id = 'ggb_file_button'>
+            <span class="fa fa-upload"></span>
+          </button>
           <button class = 'dev-onglet' type="button" id = 'avant_button'> Avant </button>
           <button class = 'dev-onglet' type="button" id = 'ggb_commands_button'> Geogebra </button>
           <button class = 'dev-onglet' type="button" id = 'enonce_button'> Enoncé </button>
@@ -108,12 +134,13 @@ $( document ).ready(function(){
           <button class = 'dev-onglet' type="button" id = 'reponse_button'> Réponse </button>
       </div>
       <div  style = 'display:inline-flex; align-content:center'>
-        <button class=  'dev-glyph' type="button" id='home_button'><span class="glyphicon glyphicon-home"></span></button>
-        <button class = 'dev-glyph' type="button" id='preview_button'><span class="glyphicon glyphicon-play"></span> </button>
+        <button class=  'dev-glyph' type="button" id='home_button'><span class="fa fa-home"></span></button>
+        <button class = 'dev-glyph' type="button" id='preview_button'><span class="fa fa-play"></span> </button>
       </div>
     </div>
+    <div class='editeur' id='apres' > </div>
     <div class='editeur' id='editeur' > </div>
     </div>
-  <iframe class='exo' id = 'frame_exo' src="{% url 'run_exo' pk=pk %}"></iframe>
+    <iframe class='exo' id = 'frame_exo' src="{% url 'run_exo' pk=pk %}"></iframe>
 </div>
  {% endblock %}

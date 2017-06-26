@@ -31,11 +31,13 @@ class Exo(models.Model):
 	layouts_corrige = {'STD': 'layout_standard_corrige.html', 'GGB': 'layout_geogebra_corrige.html'}
 	# les types d'exos
 	EXO_LAYOUTS = (('STD', 'Standard'),	('GGB', 'Geogebra'))
+	EXOS_EMPTY_GGB_FILE = os.path.join(settings.MEDIA_ROOT,'ggb_files/empty.ggb')
 
+	# layout de l'exo. Pour l'instant 'standard' ou 'geogebra', renvoie à un fichier dans LAYOUTS_DIRECTORY
 	layout = models.CharField(max_length=3, choices=EXO_LAYOUTS, default = 'STD')
 	author = models.ForeignKey('auth.User')
 	title = models.CharField(max_length=200)
-	# layout de l'exo. Pour l'instant 'standard' ou 'geogebra', renvoie à un fichier dans LAYOUTS_DIRECTORY
+	# Fichier geogebra qui contient la construction initiale
 	ggb_file = models.FileField(upload_to = 'ggb_files', blank = True, default = '')
 	# contient le code Python exécuté avant le rendu de l'exo. En particulier génère les
 	# éléments 'random' de l'exo.
@@ -52,9 +54,6 @@ class Exo(models.Model):
 	reponse = models.TextField(blank = True, default = '')
 
 	def layout_enonce(self): # renvoie le nom du fichier layout_enonce
-		print(self.layouts_enonce)
-		print('\n'+'self.layout' + self.layout +'\n')
-		print(self.layouts_enonce[self.layout])
 		return settings.LAYOUTS_DIRECTORY+'/'+self.layouts_enonce[self.layout]
 
 	def layout_corrige(self): # renvoie le nom du fichier layout_corrige
@@ -68,14 +67,18 @@ class Exo(models.Model):
 		dictionnaire['ok_answer'] = {}
 		return execution(self.apres, dictionnaire)
 	# renvoie les commandes geogebra avec les variables python remplacées par leurs valeurs
+	# il faut enlever les lignes blanches qui provoquent un message d'erreur dans l'applet geogebra
 	def exec_ggb(self, dictionnaire):
-		return Template(self.ggb_commands).render(Context(dictionnaire))
-
-	def assign(self, object):
+		commandes = Template(self.ggb_commands).render(Context(dictionnaire))
+		commandes = os.linesep.join([s for s in commandes.splitlines() if s])
+		print(commandes)
+		return commandes
 	# permet de copier dans l'exo une variable python.
+	def assign(self, object):
 		for key in object :
 			if hasattr(self, key): setattr(self, key, object[key])
-
+	# renvoie le contenu de l'objet sous forme d'un dictionnaire.
+	# A MODIFIER QUAND LE MODELE CHANGE
 	def json(self):
 		return {'pk': self.pk, 'title': self.title, 'avant': self.avant,
 		'layout': self.layout,
