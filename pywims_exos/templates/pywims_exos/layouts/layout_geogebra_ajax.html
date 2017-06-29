@@ -1,0 +1,159 @@
+{% extends 'pywims_exos/layout_appli.html' %}
+{% load input_fields_ajax %}
+{% load json_filter %}
+
+
+{% block contenu %}
+
+<script type="text/javascript" src="https://cdn.geogebra.org/apps/deployggb.js"></script>
+<script type="text/javascript">
+	var parameters = {
+		"prerelease":false,
+		"width":500,
+		"height":300,
+		"showToolBar":false,
+		"borderColor":"#FFFFFF",
+		"showMenuBar":false,
+		"showAlgebraInput":false,
+ 		"showResetIcon":false,
+//		"enableLabelDrags":false,
+		"enableShiftDragZoom":true,
+		"enableRightClick":false,
+		"capturingThreshold":null,
+		"showToolBarHelp":false,
+ 		"errorDialogsActive":true,
+//		"useBrowserForJS":true,
+ 		"filename":"{{ ggb_file.url }}"
+	};
+
+	parameters.appletOnLoad = function() {
+		var commandes = {{ ggb_commands|tojson }};
+		if (commandes != '')	ggbApplet.evalCommand(commandes);
+	}
+	var applet = new GGBApplet('5.0', parameters);
+
+	// fonction appelée quand le formulaire est soumis
+	function ggbSubmit() {
+		// remplit les champs 'ggb_input_??' par une valeur obtenue de l'applet geogebra
+		$("input[id^=form_ggb_]").each(function() {
+			$(this).val(ggbApplet.getValue($(this).attr('id').slice(9)));
+		});
+	}
+	function ggbValues() {
+		// remplit les champs 'ggb_input_??' par une valeur obtenue de l'applet geogebra
+		var n = ggbApplet.getObjectNumber();
+		var values = [];
+		for (var i = 1; i < n+1; i++){
+			var name = ggbApplet.getObjectName(i);
+			var value = ggbApplet.getValue(name);
+			values.push({name: 'ggb_' + name, type: 'ggb', value: value});
+		}
+		return values;
+	}
+
+</script>
+
+<script>
+$( document ).ready(function(){
+  (function ( $ ) {
+      $.fn.styling = function(type, style) {
+        if (type != 'drg') this.attr('disabled', 'disabled');
+        if (style === 'wrong_answer') this.css("background-color", "LightPink");
+        if (style === 'good_answer') this.css("background-color", "LightGreen");
+        return this;
+      };
+  }( jQuery ));
+
+  if(window.top != window.self) {
+    $('#home-link').remove();
+  }
+
+	applet.inject('ggb_applet_container', 'preferHTML5');
+
+
+  function onSubmit(inputs, feedback) {
+    for(var i = 0; i < inputs.length; i++){
+      var input = inputs[i];
+
+      if ((input.type == 'txt') || (input.type == 'sel')) {
+        $( "#form_"+input.type+'_'+input.name ).styling(input.type, input.style);
+      }
+
+      // to be painted, the drag element must be on a drop element
+      if ((input.type == 'drg') && (input.value.slice(0,7) != 'origin_')
+      && (input.value != '')){
+        // in drag fields, the element to be painted is not the input element, which is hidden
+        // its name is simply "name", whereas the input's name is "form_drg_name"
+        $( "#"+input.name ).styling(input.type, input.style);
+      }
+
+			// ICI ICI ICI ICI DO SOMTHING WITH GGB INPUTS
+    }
+    // show feedback and navigation, hide 'submit' button
+    $( "#feedback_div" ).html(feedback);
+    // typeset math in feedback before displaying it
+    MathJax.Hub.Queue(["Typeset",MathJax.Hub,feedback_div]);
+    $( "#feedback_div" ).toggle();
+    $( "#submit_div" ).toggle();
+    $( "#navigation_div" ).toggle();
+
+    // change title
+    $( "#enonce" ).toggle();
+    $( "#corrige" ).toggle();
+  }
+
+  $( "#submit_button" ).click(function() {
+    // get values from input fields
+    var inputs = [];
+    // id is of the form 'form_typ_name'
+    $( "[id^='form_']" ).each(function() {
+      var type = this.id.slice(5,8); // type of field, a 3 letter code, cf input tag defs
+      var name = this.id.slice(9); // name of the variable
+      var value = $(this).val();
+      var input = {type: type, name: name, value:value};
+      inputs.push(input);
+    });
+		// add values from geogebra construction
+		inputs.push.apply(inputs, ggbValues());
+
+    var status = {requested_action: 'submit', inputs: inputs, pk: {{ pk|tojson }} };
+    $.ajax({
+      type : "POST",
+      url : "{% url 'run_exo_ajax' pk=pk %}",
+      data: JSON.stringify(status, null, '\t'),
+      contentType: 'application/json;charset=UTF-8',
+      success: function(returned_status) {
+        status = returned_status;
+        onSubmit(status.inputs, status.feedback);
+      }
+    });
+  });
+});
+
+</script>
+
+<div class = 'titre'>
+  <h1 id="enonce">PyWims, énoncé</h1>
+  <h1 id="corrige" style = 'display: none'>PyWims, corrigé</h1>
+  <a id='home-link' href="/" class="glyph"><span class="fa fa-home"></span></a>
+</div>
+
+<div id='ggb_applet_container' class='ggb_applet_container'></div>
+
+
+<div class='exo'>
+  <div class='form-enonce'>
+    {% block enonce_exo %}{% endblock %}
+  </div>
+
+  <div class = validation-enonce id = "submit_div">
+    <button class = 'input'  id = "submit_button" value=Valider> Valider </button>
+  </div>
+  <div class = validation-enonce id = "navigation_div" style = 'display: none'>
+    <a href = "{% url 'run_exo_ajax' pk=pk %}">
+      <button class = 'input' id = "again_button" value=Recommencer> Recommencer </button>
+    </a>
+  </div>
+  <div class='feedback' id = "feedback_div" style = 'display: none'></div>
+</div>
+{% endblock %}

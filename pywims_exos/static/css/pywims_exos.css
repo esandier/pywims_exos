@@ -1,10 +1,10 @@
 /* Général */
 
-* {
+/** {
     box-sizing: border-box;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
-}
+}*/
 body {
   font-family: 'Crete Round', serif;
 }
@@ -34,7 +34,7 @@ div.titre {
 	background:inherit;
 	border:none;
 	color: #ffffff; /* ce sont des glyphs blancs */
-	font-size: 18pt;
+	font-size: 20pt;
 	margin-right: 20px;
 	align-self:center;
 }
@@ -131,11 +131,11 @@ button.dev-titre, span.dev-titre { /* titre de l'exo */
 /* View mode développement : volet preview exo */
 
 iframe.exo {
-	flex:1;
-  margin:0;
+  margin:none;
   border:none;
-  align-self:stretch;
+  padding:0px 0px 0px 0px;
 	height:100vh;
+  width:100%;
 }
 
 /* Les exos */
@@ -197,7 +197,7 @@ div.source  {
 }
 .drag-contenu {
 	display:flex;
-	position:absolute;
+  position:absolute;
 	background:inherit;
 	height:inherit;
 	width:inherit;
@@ -214,45 +214,24 @@ span.mauvaise_reponse {
 }
 
 
-/* Menu développement bootstrap INUTILISE INUTILISE
-.dev_page {
-	background: #eee;
-	height:100vh;
-}
-
-/* View mode développement : volet éditeur
-
-.dev-pane-edit {
-  height:100vh;
-}
-
-.dev-glyphs {
-  font-size:24pt;
+/* Menu développement bootstrap */
+div.dev-titre { /* titre de l'exo */
+  display:inline-block;
+  margin:5px;
+	font-size:12pt;
   color:white;
-  padding:10px;
-  }
-
-.dev-title-glyph {
-  margin-left:20px;
+  white-space: pre; /* nécessaire pour pouvoir enter des espaces */
 }
 
-.dev-edit {
-	height:100%;
-	background: White;
-  border-right: 4px solid Plum;
-  font-size: 14px;
-}
-.dev-tab-title {
-	color: black;
-	background:Plum;
-	font-size:11pt;
+div.dev-top {
 }
 
-.dev-title { /* titre de l'exo
-	font-size:14pt;
-  color:white;
-  padding:10px;
+div.edit-pane {
+  height:100%;
 }
-.dev-navbar { /* titre de l'exo
-padding-left:10px
+
+.nav>li>a {
+  font-size:10pt;
+  padding:2px 8px 2px 8px;
+  color:black;
 }

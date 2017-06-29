@@ -58,6 +58,62 @@ def delete_exo(request, pk):
 	exos = Exo.objects.all().order_by('title')
 	return redirect('liste_exos')
 
+def run_exo_ajax(request, pk):
+	if (request.method == 'GET') and (pk != 0) :
+		# pk = primary_key de l'exo dans la base de donnée, on le stocke dans le
+		# dictionnaire request.session
+		exo = get_object_or_404(Exo, pk=pk)
+		# On récupère le dictionnaire des variables de l'exo après execution de 'avant'
+		# et on le stocke dans request.session
+		dictionnaire = exo.exec_avant({})
+		request.session['current_exo_dict'] = dictionnaire
+		# Le dictionnaire envoyé au template doit être modifié:
+		# les expressions sympy sont transformées en Latex par la fonction for_template
+		contexte = for_template(dictionnaire)
+		# on ajoute la primary key de l'exo, utilisée quand on redirige vers la vue 'corrigé'
+		contexte['pk'] = pk
+		# Intégration géogebra.
+		if (exo.layout == 'GGB') :
+			contexte['ggb_commands'] = exo.exec_ggb(dictionnaire)
+			contexte['ggb_file'] = exo.ggb_file
+
+		string = "{% extends '" + exo.layout_enonce() + "' %}\n {% load input_fields_ajax %}\n"\
+		+ '{% block enonce_exo %}\n'+ exo.enonce + '\n{% endblock %}'
+		# return HttpResponse(Template(en_tete_exo + exo.enonce + fin_exo).render(Context(contexte)))
+		return HttpResponse(Template(string).render(Context(contexte)))
+
+	if request.method == 'POST':
+		#print('POST')
+		status = json.loads(request.body.decode())
+		#print('STATUS\n\n',status,'\n\n')
+
+		if status['requested_action'] == 'submit' :
+			exo = get_object_or_404(Exo, pk=status['pk'])
+			# Les données récupérées après l'exécution de 'avant'. Il faut les récupérer dans un contexte
+			# evaluate(False), sinon les expressions sympy peuvent être évaluées, et on ne retrouve pas l'original.
+			with evaluate(False):
+				dictionnaire = request.session['current_exo_dict']
+			# add user-input to the dictionary
+			#print('FORM DATA\n\n', status['inputs'], '\n\n')
+			for input in status['inputs'] :
+				dictionnaire[input['name']] = input['value']
+
+			# on ajoute/modifie des données au dictionnaire par l'exécution de 'après'
+			#print('DICTIONNAIRE\n\n', dictionnaire, '\n\n')
+			dictionnaire = exo.exec_apres(dictionnaire)
+			ok_answer = dictionnaire['ok_answer']
+
+			for input in status['inputs'] :
+				if (input['name'] in ok_answer) and (ok_answer[input['name']] == True) :
+					input['style'] = "good_answer"
+				else :
+					input['style'] = "wrong_answer"
+
+			contexte = for_template(dictionnaire)
+			status['feedback'] = Template(exo.reponse).render(Context(contexte))
+			#print('RETURNED STATUS\n\n',status,'\n\n')
+			return HttpResponse(json.dumps(status), content_type='application/json')
+# OBSOLETE
 def run_exo(request, pk):
 	# pk = primary_key de l'exo dans la base de donnée, on le stocke dans le
 	# dictionnaire request.session
@@ -80,7 +136,7 @@ def run_exo(request, pk):
 		+ '{% block enonce_exo %}\n'+ exo.enonce + '\n{% endblock %}'
 	# return HttpResponse(Template(en_tete_exo + exo.enonce + fin_exo).render(Context(contexte)))
 	return HttpResponse(Template(string).render(Context(contexte)))
-
+# OBSOLETE
 def corrige_exo(request, pk):
 	# Les données récupérées après l'exécution de 'avant'. Il faut les récupérer dans un contexte
 	# evaluate(False), sinon les expressions sympy peuvent être évaluées, et on ne retrouve pas l'original.
@@ -124,9 +180,11 @@ def dev_exo(request, pk):#  affiche la page de développement
 
 	if (request.method == 'GET') and (pk != 0):
 		exo = get_object_or_404(Exo, pk=pk)
-		status = {'exo': exo.json(), 'current_code' : 'avant', 'langage' : 'python', 'echo' : exo.title}
-		return render(request, 'pywims_exos/layout_mode_dev.html',\
-		  {'status': status, 'pk':pk, 'LAYOUTS':Exo.EXO_LAYOUTS, 'EMPTY_GGB_FILE':Exo.EXOS_EMPTY_GGB_FILE})
+		block_list = exo.block_info[exo.layout] # la liste des blocs pour ce type d'exo
+		status = {'exo': exo.json(), 'current_block' : 'avant', 'langage' : 'python', 'echo' : exo.title}
+		return render(request, 'pywims_exos/layout_mode_dev_bootstrap.html',\
+		  {'status': status, 'pk':pk, 'LAYOUTS':Exo.EXO_LAYOUTS,\
+		   'EMPTY_GGB_FILE':Exo.EXOS_EMPTY_GGB_FILE, 'block_list':block_list})
 
 	if request.method == 'POST':
 		print('POST')

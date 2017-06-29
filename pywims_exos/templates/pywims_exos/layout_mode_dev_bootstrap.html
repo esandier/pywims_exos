@@ -1,0 +1,124 @@
+{% extends "pywims_exos/layout_appli.html" %}
+{% load json_filter %}
+{% block contenu  %}
+
+ <!--This is a comment. Comments are not displayed in the browser-->
+
+<script src="https://ajaxorg.github.io/ace-builds/src/ace.js" type="text/javascript" charset="utf-8"></script>
+<script>
+$( document ).ready(function(){
+  var status = {{ status|tojson }};
+  var block_list = {{ block_list|tojson }};
+  var editor = {}
+  for (var i = 0; i < block_list.length; i++) {
+    var block = block_list[i];
+    editor[block.name] = ace.edit("edit_"+ block.name);
+    editor[block.name].setTheme("ace/theme/tomorrow");
+    editor[block.name].getSession().setMode("ace/mode/"+ block.langage);
+    editor[block.name].getSession().setUseWrapMode(true);
+    editor[block.name].getSession().setValue(status.exo[block.name]);
+    document.getElementById("edit_" + block.name).style.fontSize='14px';
+    editor[block.name].setAutoScrollEditorIntoView(true);
+    editor[block.name].resize();
+  }
+  $('.nav-tabs a:first').tab('show');
+
+  $( "#preview_button, #home_button" ).click(function() {
+    for (var i = 0; i < block_list.length; i++) {
+      var block = block_list[i];
+      status.exo[block.name] = editor[block.name].getValue();
+    }
+    // on enlève '_button' au nom du bouton pour obtenir l'action requise
+    status['requested_action'] = this.id.slice(0, -7);
+    $.ajax({
+      type : "POST",
+      url : "{% url 'dev_exo' pk=pk %}",
+      data: JSON.stringify(status, null, '\t'),
+      contentType: 'application/json;charset=UTF-8',
+      success: function(returned_status) {
+        status = returned_status;
+        if (status['requested_action'] == 'preview')
+        document.getElementById('frame_exo').contentWindow.location.reload();
+        if (status['requested_action'] == 'home')
+        window.location.replace("{% url 'liste_exos' %}");
+      }
+    });
+  });
+
+  // rendre le titre de l'exo modifiable
+  $( "#titre-pencil" ).on( "click", function() {
+     if ($( "#titre" ).attr('contentEditable') != 'true') {
+       $( "#titre" ).attr('contentEditable', 'true');
+       $( "#titre" ).css({"border-color": "#white",
+              "border-width":"1px",
+              "border-style":"solid"});
+     }
+     $( "#titre" ).focus();
+   });
+
+   $( "#titre" ).bind('keypress', function(e) {
+     var code = e.keyCode || e.which;
+
+     if ((code == 13) || (code == 27)) {
+       $( "#titre" ).attr('contentEditable', 'false');
+       $( "#titre" ).css({'border': 'none'});
+     }
+
+     if (code == 13) {  // touche enter : on enregistre le nouveau titre
+       status.exo['title'] = $( "#titre" ).html();
+       status['requested_action'] = 'update-title';
+       $.ajax({
+         type : "POST",
+         url : "{% url 'dev_exo' pk=pk %}",
+         data: JSON.stringify(status, null, '\t'),
+         contentType: 'application/json;charset=UTF-8',
+         success: function(returned_status) {}
+       });
+     }
+     // touche escape : on revient au titre initial
+     if (code == 27) $( "#titre" ).html(status.exo['title']);
+   });
+
+});
+</script>
+
+<div class="container-fluid h-100">
+  <div class="row">
+    <div class="col-7 d-flex flex-column align-items-stretch" style = "background-color:plum; padding:0px 7px 0px 0px">
+      <div class = "row dev-top">
+        <div class = 'col'>
+          <div class = 'dev-titre' id = 'titre'> {{ status.exo.title }} </div>
+          <div class = 'dev-titre'><span class="fa fa-pencil" id = 'titre-pencil'></span></div>
+
+          <!-- Nav tabs -->
+          <ul class="nav nav-tabs" role="tablist">
+            {% for block in block_list %}
+            <li class="nav-item">
+              <a class="nav-link" data-toggle="tab" href="#edit_{{ block.name }}" role="tab">{{ block.label }}</a>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+        <div class = 'col-md-auto d-flex align-items-center'>
+          <button class=  'dev-glyph' type="button" id='home_button'><span class="fa fa-home"></span></button>
+          <button class = 'dev-glyph' type="button" id='preview_button'><span class="fa fa-play"></span> </button>
+        </div>
+      </div>
+
+      <!-- Tab panes -->
+      <div class="edit-pane">
+        <div class="tab-content">
+        {% for block in block_list %}
+          <div class="edit-pane tab-pane"  id="edit_{{ block.name }}" role="tabpanel"></div>
+        {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <iframe class='col-5 exo' id = 'frame_exo' src="{% url 'run_exo_ajax' pk=pk %}"></iframe>
+  </div>
+</div>
+
+
+
+ {% endblock %}

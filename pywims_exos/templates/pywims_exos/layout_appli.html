@@ -3,25 +3,26 @@
 <html>
 <head>
 	<title>PyWims</title>
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
-	<link href="//fonts.googleapis.com/css?family=Lobster&subset=latin,latin-ext" rel="stylesheet" type="text/css">
-	<link href="//fonts.googleapis.com/css?family=Crete+Round&subset=latin,latin-ext" rel="stylesheet" type="text/css">
-	<link rel="stylesheet" href="{% static 'css/pywims_exos.css' %}">
-	<script type="text/x-mathjax-config">
-	MathJax.Hub.Config({
-		tex2jax: {
-			inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-			displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
-			processEscapes: true,
-		},
-		menuSettings: { inTabOrder : false }
-	});
-	</script>
-	<script type="text/javascript"
-	src="https://cdn.rawgit.com/mathjax/MathJax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
-	</script>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+<link href="//fonts.googleapis.com/css?family=Crete+Round&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+<link rel="stylesheet" href="{% static 'css/pywims_exos.css' %}">
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+	tex2jax: {
+		inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+		displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+		processEscapes: true,
+	},
+	menuSettings: { inTabOrder : false }
+//	displayAlign : "left",
+//	displayIndent : "2em"
+});
+</script>
+<script type="text/javascript"
+src="https://cdn.rawgit.com/mathjax/MathJax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 
 	<script>
 	function allowDrop(ev) {
@@ -38,16 +39,24 @@
 		// data est l'id de la cible du drop
 		var data=ev.dataTransfer.getData("text");
 		// Le drop
+		console.log(target, data);
 		document.getElementById(target).appendChild(document.getElementById(data));
 		// Renseignement de la variable via un champ "input" caché, dont l'id est celle le la cible, préfacée par 'input_'
-		var input=document.getElementById('input_'+data);
-		if (target != undefined) input.value = target;
-		if (target == undefined) input.value = '';
+		//var input=document.getElementById('input_'+data);
+		//if (target != undefined) input.value = target;
+		//if (target == undefined) input.value = '';
+		var input_ajax=document.getElementById('form_drg_'+data);
+		if (target != undefined) input_ajax.value = target;
+		if (target == undefined) input_ajax.value = '';
 	}
 	</script>
 </head>
 <body>
 				{% block contenu %}
 				{% endblock %}
+				<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+				<script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js"></script>
+				<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js"></script>
+
 </body>
 </html>

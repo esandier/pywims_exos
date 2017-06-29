@@ -53,7 +53,7 @@ $( document ).ready(function(){
 				<a href="{% url 'dev_exo' pk=exo.pk %}" class="list-glyph">
 					<span class="fa fa-pencil"></span></a>
 				<div style = 'display:inline-block'>
-					<a href="{% url 'run_exo' pk=exo.pk %}" class="list-title">
+					<a href="{% url 'run_exo_ajax' pk=exo.pk %}" class="list-title">
 						<h1>{{ exo.title }}	</h1>
 					</a>
 					<p>{{ exo.author }}</p>

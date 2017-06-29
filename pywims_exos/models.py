@@ -27,13 +27,25 @@ def execution(code_string, dictionnaire):
 
 class Exo(models.Model):
 	# les fichiers layout pour chaque type d'exo
-	layouts_enonce = {'STD': 'layout_standard.html', 'GGB': 'layout_geogebra.html'}
+	layouts_enonce = {'STD': 'layout_standard_ajax.html', 'GGB': 'layout_geogebra_ajax.html'}
 	layouts_corrige = {'STD': 'layout_standard_corrige.html', 'GGB': 'layout_geogebra_corrige.html'}
 	# les types d'exos
 	EXO_LAYOUTS = (('STD', 'Standard'),	('GGB', 'Geogebra'))
 	EXOS_EMPTY_GGB_FILE = os.path.join(settings.MEDIA_ROOT,'ggb_files/empty.ggb')
-
-	# layout de l'exo. Pour l'instant 'standard' ou 'geogebra', renvoie à un fichier dans LAYOUTS_DIRECTORY
+	# infos sur les blocs utiles à l'éditeur
+	block_info = {
+		'STD' : [
+			{'name': 'avant', 'label': 'Avant', 'langage':'python'},
+			{'name': 'enonce', 'label': 'Enoncé', 'langage':'django'},
+			{'name': 'apres', 'label': 'Après', 'langage':'python'},
+			{'name': 'reponse', 'label': 'Réponse', 'langage':'django'}],
+		'GGB' : [
+			{'name': 'avant', 'label': 'Avant', 'langage':'python'},
+			{'name': 'ggb_commands', 'label': 'Geogebra', 'langage':'django'},
+			{'name': 'enonce', 'label': 'Enoncé', 'langage':'django'},
+			{'name': 'apres', 'label': 'Après', 'langage':'python'},
+			{'name': 'reponse', 'label': 'Réponse', 'langage':'django'}]}
+	# layout de l'exo. Pour l'instant 'standard' ou 'geogebra'
 	layout = models.CharField(max_length=3, choices=EXO_LAYOUTS, default = 'STD')
 	author = models.ForeignKey('auth.User')
 	title = models.CharField(max_length=200)
@@ -71,7 +83,6 @@ class Exo(models.Model):
 	def exec_ggb(self, dictionnaire):
 		commandes = Template(self.ggb_commands).render(Context(dictionnaire))
 		commandes = os.linesep.join([s for s in commandes.splitlines() if s])
-		print(commandes)
 		return commandes
 	# permet de copier dans l'exo une variable python.
 	def assign(self, object):
@@ -83,7 +94,7 @@ class Exo(models.Model):
 		return {'pk': self.pk, 'title': self.title, 'avant': self.avant,
 		'layout': self.layout,
 		'ggb_commands': self.ggb_commands, 'enonce': self.enonce,
-		'apres': self.apres, 'reponse': self.reponse}
+		'apres': self.apres, 'reponse': self.reponse, 'block_info': self.block_info}
 
 	def __str__(self):
 		return self.title
