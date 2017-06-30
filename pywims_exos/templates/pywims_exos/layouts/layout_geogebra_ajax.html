@@ -50,6 +50,13 @@
 		}
 		return values;
 	}
+	function ggbStyling(name, style){
+		// console.log('name : ', name, ', style:', style);
+		if (style === 'wrong_answer') ggbApplet.setColor(name, 255,0,0);
+		else if (style === 'good_answer') ggbApplet.setColor(name, 0,255,0);
+		// geogebra objects other than inputs are greyed for feedback
+		else ggbApplet.setColor(name, 60,60,60);
+	}
 
 </script>
 
@@ -57,7 +64,7 @@
 $( document ).ready(function(){
   (function ( $ ) {
       $.fn.styling = function(type, style) {
-        if (type != 'drg') this.attr('disabled', 'disabled');
+				//if (type != 'drg') this.attr('disabled', 'disabled');
         if (style === 'wrong_answer') this.css("background-color", "LightPink");
         if (style === 'good_answer') this.css("background-color", "LightGreen");
         return this;
@@ -76,19 +83,21 @@ $( document ).ready(function(){
       var input = inputs[i];
 
       if ((input.type == 'txt') || (input.type == 'sel')) {
-        $( "#form_"+input.type+'_'+input.name ).styling(input.type, input.style);
+        $( "#form_"+input.type+'_'+input.name )
+					.attr('disabled', 'disabled')
+					.styling(input.type, input.style);
       }
 
-      // to be painted, the drag element must be on a drop element
+			// in drag fields, the element to be painted is not the input element, which is hidden
+			// its name is simply "name", whereas the input's name is "form_drg_name"
+			// to be painted, the drag element must be on a drop element
       if ((input.type == 'drg') && (input.value.slice(0,7) != 'origin_')
-      && (input.value != '')){
-        // in drag fields, the element to be painted is not the input element, which is hidden
-        // its name is simply "name", whereas the input's name is "form_drg_name"
-        $( "#"+input.name ).styling(input.type, input.style);
-      }
+      && (input.value != '')) $( "#"+input.name ).styling(input.type, input.style);
 
-			// ICI ICI ICI ICI DO SOMTHING WITH GGB INPUTS
+			// call ggb_styling, but first strip the ggb_ prefix from the name
+			if (input.type == 'ggb') ggbStyling(input.name.slice(4), input.style);
     }
+
     // show feedback and navigation, hide 'submit' button
     $( "#feedback_div" ).html(feedback);
     // typeset math in feedback before displaying it

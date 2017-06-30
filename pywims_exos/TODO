@@ -1,14 +1,9 @@
 Geogebra :
-	- Pour les champs input, voir si on peut réutiliser les variables geogebra,
- 	avec le préfixe ggb_ pour éviter les conflits.
 	- Ajouter le traitement de ok_answer: colorie en vert ou en rouge l'objet.
 	- Améliorer le layout: enoncé à gauche, applet à droite.
 
 Corrige :
-	- Explorer une autre façon de faire, où au lieu de recharger une page,
-	on modifie l'existant, ce qui est plus agréable pour l'utilisateur. Au moins
-	pour geogebra qui met des plombes à charger.
-	- Faire de la validation et signaler les inputs incompréhensibles ou ne correspondant
+		- Faire de la validation et signaler les inputs incompréhensibles ou ne correspondant
 	pas à ce qui est demandé (nombre ou fraction irreductible, par exemple).
 
 Exo appelable :

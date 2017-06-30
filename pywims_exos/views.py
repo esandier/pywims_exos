@@ -8,36 +8,6 @@ from .fonctions import *
 from .forms import ExoForm
 from django.core.files import File
 
-#
-#
-#       Enrobage des exos
-#
-#
-
-# Des champs de formulaire de type 'input' sont définis pour offrir une interface sympa
-# la définition est dans le fichiers input_fields.py, qui réfère à un template par champ
-en_tete_exo = """
-{% extends "exo_enonce.html" %}
-{% load input_fields %}
-{% block enonce_exo %}
-"""
-# Les champs formulaire de type 'input' sont redéfinis pour l'affichage
-# du corrigé : au lieu de champs de formulaire, ils afficheront la réponse de l'utilisateur
-# la définition est dans le fichiers input_fields_for_corrige.py, qui réfère à un template par champ
-en_tete_corrige = """
-{% extends "pywims_exos/exo_corrige.html" %}
-{% load input_fields_for_corrige %}
-{% block enonce_exo %}
-"""
-fin_exo = """
-{% endblock %}
-"""
-en_tete_reponse =  """
-{% block feedback %}
-"""
-fin_reponse = """
-{% endblock %}
-"""
 
 def liste_exos(request):
 	if request.method == 'GET':
@@ -46,7 +16,7 @@ def liste_exos(request):
 	if request.method == 'POST':
 		status = json.loads(request.body.decode())
 		exo = Exo()
-		print(status)
+		# print(status)
 		exo.title = status['title']
 		exo.author = request.user
 		exo.save()
@@ -94,24 +64,29 @@ def run_exo_ajax(request, pk):
 			with evaluate(False):
 				dictionnaire = request.session['current_exo_dict']
 			# add user-input to the dictionary
-			#print('FORM DATA\n\n', status['inputs'], '\n\n')
+			# print('FORM DATA\n\n', status['inputs'], '\n\n')
 			for input in status['inputs'] :
 				dictionnaire[input['name']] = input['value']
 
 			# on ajoute/modifie des données au dictionnaire par l'exécution de 'après'
-			#print('DICTIONNAIRE\n\n', dictionnaire, '\n\n')
+			# print('DICTIONNAIRE\n\n', dictionnaire, '\n\n')
 			dictionnaire = exo.exec_apres(dictionnaire)
 			ok_answer = dictionnaire['ok_answer']
 
 			for input in status['inputs'] :
 				if (input['name'] in ok_answer) and (ok_answer[input['name']] == True) :
 					input['style'] = "good_answer"
-				else :
+				elif (input['name'] in ok_answer) and (ok_answer[input['name']] == False) :
 					input['style'] = "wrong_answer"
+				# except for geogebra object, not good means wrong
+				elif (input['type'] != 'ggb') :
+					input['style'] = "wrong_answer"
+				# for geogebra objects, not good means nothing (otherwise most would be wrong)
+				else: input['style'] = "other"
 
 			contexte = for_template(dictionnaire)
 			status['feedback'] = Template(exo.reponse).render(Context(contexte))
-			#print('RETURNED STATUS\n\n',status,'\n\n')
+			# print('RETURNED STATUS\n\n',status,'\n\n')
 			return HttpResponse(json.dumps(status), content_type='application/json')
 # OBSOLETE
 def run_exo(request, pk):
@@ -171,10 +146,6 @@ def corrige_exo(request, pk):
 	+ '{% block feedback %}\n' + exo.reponse + '\n{% endblock %}'
 	return HttpResponse(Template(string).render(Context(contexte)))
 
-#	return HttpResponse(
-#		Template(en_tete_corrige + exo.enonce + fin_exo + en_tete_reponse + exo.reponse + fin_reponse)
-#			.render(Context(contexte))
-
 
 def dev_exo(request, pk):#  affiche la page de développement
 
@@ -194,7 +165,7 @@ def dev_exo(request, pk):#  affiche la page de développement
 		(status['requested_action'] == 'home') or \
 		 (status['requested_action'] == 'update-title') or\
 		 (status['requested_action'] == 'update-layout'):
-			print('status   ',status)
+			# print('status   ',status)
 			exo = get_object_or_404(Exo, pk=status['exo']['pk'])
 			if (status['exo']['layout'] == "GGB") and (status['requested_action'] == 'update-layout') :
 				f = open(Exo.EXOS_EMPTY_GGB_FILE)
