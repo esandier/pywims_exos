@@ -34,6 +34,23 @@
 
 <script>
 $( document ).ready(function(){
+    (function ( $ ) {
+      $.fn.styling = function(type, style) {
+        var color = '';
+        var object = this;
+        if (type != 'drg') this.attr('disabled', 'disabled');
+        if (style === 'wrong_answer') color = "LightPink";
+        if (style === 'good_answer') color = "LightGreen";
+        this.animate({width: 'toggle'},function(){
+          object.css("background-color", color)
+          object.animate({width: 'toggle'});
+        });
+        return this;
+      };
+  }( jQuery ));
+
+
+
     
   if(window.top != window.self) {
     $('#home-link').remove();
@@ -62,22 +79,6 @@ $( document ).ready(function(){
 <!-- Javascript of the standard Pywims exercise layout -->
 
 <script>
-  (function ( $ ) {
-      $.fn.styling = function(type, style) {
-        var color = '';
-        var object = this;
-        if (type != 'drg') this.attr('disabled', 'disabled');
-        if (style === 'wrong_answer') color = "LightPink";
-        if (style === 'good_answer') color = "LightGreen";
-        this.animate({width: 'toggle'},function(){
-          object.css("background-color", color)
-          object.animate({width: 'toggle'});
-        });
-        return this;
-      };
-  }( jQuery ));
-
-
   function paint(inputs) {
     console.log('inputs ', inputs);
     if (inputs['txt'] != undefined)
