@@ -1,9 +1,142 @@
-{% extends 'pywims_exos/layout_appli.html' %}
+﻿{% extends 'pywims_exos/layout_appli.html' %}
 {% load input_fields_ajax %}
 {% load json_filter %}
 
 
 {% block contenu %}
+
+<div class = 'titre'>
+  <h1 id="enonce">PyWims, énoncé</h1>
+  <h1 id="corrige" style = 'display: none'>PyWims, corrigé</h1>
+  <a id='home-link' href="/" class="glyph"><span class="fa fa-home"></span></a>
+</div>
+
+<div id='ggb_applet_container' class='ggb_applet_container'></div>
+
+
+<div class='exo'>
+  <div class='form-enonce'>
+    {% block enonce_exo %}{% endblock %}
+  </div>
+
+  <div class = validation-enonce id = "submit_div">
+    <button class = 'input'  id = "submit_button" value=Valider> Valider </button>
+  </div>
+  <div class = validation-enonce id = "navigation_div" style = 'display: none'>
+    <a href = "{% url 'run_exo_ajax' pk=pk %}">
+      <button class = 'input' id = "again_button" value=Recommencer> Recommencer </button>
+    </a>
+  </div>
+  <div class='feedback' id = "feedback_div" style = 'display: none'></div>
+</div>
+
+<!--  script executed after page is loaded -->
+
+<script>
+$( document ).ready(function(){
+    
+  if(window.top != window.self) {
+    $('#home-link').remove();
+  }
+
+  $( "#submit_button" ).click(function() {
+    var inputs = getInputs();
+
+    var status = {requested_action: 'submit', inputs: inputs, pk: {{ pk|tojson }} };
+    $.ajax({
+      type : "POST",
+      url : "{% url 'run_exo_ajax' pk=pk %}",
+      data: JSON.stringify(status, null, '\t'),
+      contentType: 'application/json;charset=UTF-8',
+      success: function(returned_status) {
+        status = returned_status;
+        onReturn(status.inputs, status.feedback);
+      }
+    });
+  });
+});
+
+</script>
+
+
+<!-- Javascript of the standard Pywims exercise layout -->
+
+<script>
+  (function ( $ ) {
+      $.fn.styling = function(type, style) {
+        var color = '';
+        var object = this;
+        if (type != 'drg') this.attr('disabled', 'disabled');
+        if (style === 'wrong_answer') color = "LightPink";
+        if (style === 'good_answer') color = "LightGreen";
+        this.animate({width: 'toggle'},function(){
+          object.css("background-color", color)
+          object.animate({width: 'toggle'});
+        });
+        return this;
+      };
+  }( jQuery ));
+
+
+  function paint(inputs) {
+    console.log('inputs ', inputs);
+    if (inputs['txt'] != undefined)
+    for(var i = 0; i < inputs['txt'].length; i++){
+      var input = inputs['txt'][i];
+      $( "#form_txt_"+input.id ).styling('txt', input.style);
+    }
+    
+    if (inputs['sel'] != undefined)
+    for(var i = 0; i < inputs['sel'].length; i++){
+      var input = inputs['sel'][i];
+      $( "#form_sel_"+input.id ).styling('sel', input.style);
+    }
+    if (inputs['drg'] != undefined)
+    for(var i = 0; i < inputs['drg'].length; i++){
+      var input = inputs['drg'][i];
+      // to be painted, the drag element must be on a drop element
+      if ((input.value.slice(0,7) == 'origin_') || (input.value == '')) continue;
+      // in drag fields, the element to be painted is not the input element, which is hidden
+      // its id is simply "name", whereas the input's id is "form_drg_name"
+      $( "#"+input.id ).styling('drg', input.style);
+    }
+  }
+  
+  function getInputs(){
+    var inputs = {};
+    $( "[id^='form_']" ).each(function() {
+      var type = this.id.slice(5,8); // type of field, a 3 letter code, cf input tag defs
+      var id = this.id.slice(9); // name of the variable
+      var value = $(this).val();
+      if (inputs[type] == undefined) inputs[type] = []; 
+      inputs[type].push({id: id, value:value});
+    });
+    return inputs;
+  }
+
+  function onReturn(inputs, feedback) {
+    // change title, replace submit button by navigation
+    $( "#enonce" ).toggle();
+    $( "#corrige" ).toggle();
+    $( "#submit_div" ).toggle();
+    $( "#navigation_div" ).toggle();
+    
+    // Paint input fields
+    paint(inputs);
+    
+    // show feedback
+    $( "#feedback_div" ).html(feedback);
+    // typeset math in feedback before displaying it
+    MathJax.Hub.Queue(["Typeset",MathJax.Hub,feedback_div]);
+    $(":animated").promise().done(function(){
+    // will be called when all the animations on the queue finish
+      $( "#feedback_div").show(1500);
+    });
+
+  }
+</script>
+
+<!-- Additional Javascript for Geogebra exercises -->
 
 <script type="text/javascript" src="https://cdn.geogebra.org/apps/deployggb.js"></script>
 <script type="text/javascript">
@@ -31,138 +164,50 @@
 		if (commandes != '')	ggbApplet.evalCommand(commandes);
 	}
 	var applet = new GGBApplet('5.0', parameters);
+	
+	// Geogebra applet creation
+    applet.inject('ggb_applet_container', 'preferHTML5');
 
-	// fonction appelée quand le formulaire est soumis
-	function ggbSubmit() {
-		// remplit les champs 'ggb_input_??' par une valeur obtenue de l'applet geogebra
-		$("input[id^=form_ggb_]").each(function() {
-			$(this).val(ggbApplet.getValue($(this).attr('id').slice(9)));
-		});
-	}
+
 	function ggbValues() {
 		// remplit les champs 'ggb_input_??' par une valeur obtenue de l'applet geogebra
 		var n = ggbApplet.getObjectNumber();
 		var values = [];
 		for (var i = 1; i < n+1; i++){
-			var name = ggbApplet.getObjectName(i);
-			var value = ggbApplet.getValue(name);
-			values.push({name: 'ggb_' + name, type: 'ggb', value: value});
+			var id = ggbApplet.getObjectName(i);
+			var value = ggbApplet.getValue(id);
+			values.push({id: 'ggb_' + id, type: 'ggb', value: value});
 		}
 		return values;
 	}
-	function ggbStyling(name, style){
-		// console.log('name : ', name, ', style:', style);
-		if (style === 'wrong_answer') ggbApplet.setColor(name, 255,0,0);
-		else if (style === 'good_answer') ggbApplet.setColor(name, 0,255,0);
+	function ggbStyling(id, style){
+		// console.log('id : ', id, ', style:', style);
+		if (style === 'wrong_answer') ggbApplet.setColor(id, 255,0,0);
+		else if (style === 'good_answer') ggbApplet.setColor(id, 0,255,0);
 		// geogebra objects other than inputs are greyed for feedback
-		else ggbApplet.setColor(name, 60,60,60);
+		else ggbApplet.setColor(id, 60,60,60);
 	}
-
+	
+	
+	// Override functions getInputs() and paint(inputs so that they fetch
+	// geogebra values and paint geogebra
+	
+	var standardPaint = paint;
+    paint = function(inputs) {
+        standardPaint(inputs);
+        if (inputs['ggb'] != undefined)
+        for(var i = 0; i < inputs['ggb'].length; i++){
+            var input = inputs['ggb'][i];
+            ggbStyling(input.id.slice(4), input.style);
+        }
+    };
+    
+    var standardGetInputs = getInputs;
+    getInputs = function() {
+        var inputs = standardGetInputs();
+        inputs['ggb'] = ggbValues();
+        return inputs;
+    };
 </script>
 
-<script>
-$( document ).ready(function(){
-  (function ( $ ) {
-      $.fn.styling = function(type, style) {
-				//if (type != 'drg') this.attr('disabled', 'disabled');
-        if (style === 'wrong_answer') this.css("background-color", "LightPink");
-        if (style === 'good_answer') this.css("background-color", "LightGreen");
-        return this;
-      };
-  }( jQuery ));
-
-  if(window.top != window.self) {
-    $('#home-link').remove();
-  }
-
-	applet.inject('ggb_applet_container', 'preferHTML5');
-
-
-  function onSubmit(inputs, feedback) {
-    for(var i = 0; i < inputs.length; i++){
-      var input = inputs[i];
-
-      if ((input.type == 'txt') || (input.type == 'sel')) {
-        $( "#form_"+input.type+'_'+input.name )
-					.attr('disabled', 'disabled')
-					.styling(input.type, input.style);
-      }
-
-			// in drag fields, the element to be painted is not the input element, which is hidden
-			// its name is simply "name", whereas the input's name is "form_drg_name"
-			// to be painted, the drag element must be on a drop element
-      if ((input.type == 'drg') && (input.value.slice(0,7) != 'origin_')
-      && (input.value != '')) $( "#"+input.name ).styling(input.type, input.style);
-
-			// call ggb_styling, but first strip the ggb_ prefix from the name
-			if (input.type == 'ggb') ggbStyling(input.name.slice(4), input.style);
-    }
-
-    // show feedback and navigation, hide 'submit' button
-    $( "#feedback_div" ).html(feedback);
-    // typeset math in feedback before displaying it
-    MathJax.Hub.Queue(["Typeset",MathJax.Hub,feedback_div]);
-    $( "#feedback_div" ).toggle();
-    $( "#submit_div" ).toggle();
-    $( "#navigation_div" ).toggle();
-
-    // change title
-    $( "#enonce" ).toggle();
-    $( "#corrige" ).toggle();
-  }
-
-  $( "#submit_button" ).click(function() {
-    // get values from input fields
-    var inputs = [];
-    // id is of the form 'form_typ_name'
-    $( "[id^='form_']" ).each(function() {
-      var type = this.id.slice(5,8); // type of field, a 3 letter code, cf input tag defs
-      var name = this.id.slice(9); // name of the variable
-      var value = $(this).val();
-      var input = {type: type, name: name, value:value};
-      inputs.push(input);
-    });
-		// add values from geogebra construction
-		inputs.push.apply(inputs, ggbValues());
-
-    var status = {requested_action: 'submit', inputs: inputs, pk: {{ pk|tojson }} };
-    $.ajax({
-      type : "POST",
-      url : "{% url 'run_exo_ajax' pk=pk %}",
-      data: JSON.stringify(status, null, '\t'),
-      contentType: 'application/json;charset=UTF-8',
-      success: function(returned_status) {
-        status = returned_status;
-        onSubmit(status.inputs, status.feedback);
-      }
-    });
-  });
-});
-
-</script>
-
-<div class = 'titre'>
-  <h1 id="enonce">PyWims, énoncé</h1>
-  <h1 id="corrige" style = 'display: none'>PyWims, corrigé</h1>
-  <a id='home-link' href="/" class="glyph"><span class="fa fa-home"></span></a>
-</div>
-
-<div id='ggb_applet_container' class='ggb_applet_container'></div>
-
-
-<div class='exo'>
-  <div class='form-enonce'>
-    {% block enonce_exo %}{% endblock %}
-  </div>
-
-  <div class = validation-enonce id = "submit_div">
-    <button class = 'input'  id = "submit_button" value=Valider> Valider </button>
-  </div>
-  <div class = validation-enonce id = "navigation_div" style = 'display: none'>
-    <a href = "{% url 'run_exo_ajax' pk=pk %}">
-      <button class = 'input' id = "again_button" value=Recommencer> Recommencer </button>
-    </a>
-  </div>
-  <div class='feedback' id = "feedback_div" style = 'display: none'></div>
-</div>
 {% endblock %}

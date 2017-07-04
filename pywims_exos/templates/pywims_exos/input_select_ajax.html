@@ -1,6 +1,14 @@
-<select class = 'input' id = 'form_sel_{{ name }}' style = '{{ style }}'>
+<!-- Phantom prevents animations from disrupting page layout -->
+<span style = 'display:inline-block;'>
+<select class = 'input absolute' id = 'form_sel_{{ name }}' style = '{{ style }}'>
 	 {% for item in liste %}
 		 <option value='{{ item }}'> {{ item }} </option>
 	 {% endfor %}
 </select>
-<!-- <span  id ='display_sel_{{ name }}' style='display:none'></span> -->
+<select class = 'input phantom' id = 'phantom_sel_{{ name }}'  style = '{{ style }}' disabled = 'disabled'>
+	 {% for item in liste %}
+		 <option value='{{ item }}'> {{ item }} </option>
+	 {% endfor %}
+</select>
+</span>
+

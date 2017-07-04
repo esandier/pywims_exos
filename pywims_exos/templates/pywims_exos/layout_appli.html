@@ -39,7 +39,7 @@ src="https://cdn.rawgit.com/mathjax/MathJax/2.7.1/MathJax.js?config=TeX-AMS-MML_
 		// data est l'id de la cible du drop
 		var data=ev.dataTransfer.getData("text");
 		// Le drop
-		console.log(target, data);
+		//console.log(target, data);
 		document.getElementById(target).appendChild(document.getElementById(data));
 		// Renseignement de la variable via un champ "input" caché, dont l'id est celle le la cible, préfacée par 'input_'
 		//var input=document.getElementById('input_'+data);

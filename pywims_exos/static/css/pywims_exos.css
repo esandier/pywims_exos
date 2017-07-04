@@ -1,10 +1,11 @@
-/* Général */
+﻿/* Général */
 
 * {
     box-sizing: border-box;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
 }
+
 body {
   font-family: 'Crete Round', serif;
 }
@@ -171,7 +172,17 @@ iframe.exo {
 	font-size: 12pt;
 	color:black;
 	width: auto;
+	z-index:10;
 	}
+	
+.absolute{
+  position: absolute;
+  }
+  
+.phantom {
+  opacity : 0;
+  z-index: 0;
+}
 
 div.cible, div.source, div.cibleOk, div.cibleNotOk { /* les divs qui contiennent les champs drag-drop */
   display: inline-flex;

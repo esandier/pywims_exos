@@ -10,9 +10,15 @@ $( document ).ready(function(){
 
   (function ( $ ) {
       $.fn.styling = function(type, style) {
+        var color = '';
+        var object = this;
         if (type != 'drg') this.attr('disabled', 'disabled');
-        if (style === 'wrong_answer') this.css("background-color", "LightPink");
-        if (style === 'good_answer') this.css("background-color", "LightGreen");
+        if (style === 'wrong_answer') color = "LightPink";
+        if (style === 'good_answer') color = "LightGreen";
+        this.animate({width: 'toggle'},function(){
+          object.css("background-color", color)
+          object.animate({width: 'toggle'});
+        });
         return this;
       };
   }( jQuery ));
@@ -20,47 +26,65 @@ $( document ).ready(function(){
   if(window.top != window.self) {
     $('#home-link').remove();
   }
-
-  function onSubmit(inputs, feedback) {
-    for(var i = 0; i < inputs.length; i++){
-      var input = inputs[i];
-
-      if ((input.type == 'txt') || (input.type == 'sel')) {
-        $( "#form_"+input.type+'_'+input.name ).styling(input.type, input.style);
-      }
-
-      // to be painted, the drag element must be on a drop element
-      if ((input.type == 'drg') && (input.value.slice(0,7) != 'origin_')
-      && (input.value != '')){
-        // in drag fields, the element to be painted is not the input element, which is hidden
-        // its name is simply "name", whereas the input's name is "form_drg_name"
-        $( "#"+input.name ).styling(input.type, input.style);
-      }
+  
+  function Paint(inputs) {
+    if (inputs['txt'] != undefined)
+    for(var i = 0; i < inputs['txt'].length; i++){
+      var input = inputs['txt'][i];
+      $( "#form_txt_"+input.id ).styling('txt', input.style);
     }
-    // show feedback and navigation, hide 'submit' button
+    
+    if (inputs['sel'] != undefined)
+    for(var i = 0; i < inputs['sel'].length; i++){
+      var input = inputs['sel'][i];
+      $( "#form_sel_"+input.id ).styling('sel', input.style);
+    }
+    if (inputs['drg'] != undefined)
+    for(var i = 0; i < inputs['drg'].length; i++){
+      var input = inputs['drg'][i];
+      // to be painted, the drag element must be on a drop element
+      if ((input.value.slice(0,7) == 'origin_') || (input.value == '')) continue;
+      // in drag fields, the element to be painted is not the input element, which is hidden
+      // its id is simply "name", whereas the input's id is "form_drg_name"
+      $( "#"+input.id ).styling('drg', input.style);
+    }
+  }
+  
+  function getInputs(){
+    var inputs = {};
+    $( "[id^='form_']" ).each(function() {
+      var type = this.id.slice(5,8); // type of field, a 3 letter code, cf input tag defs
+      var id = this.id.slice(9); // name of the variable
+      var value = $(this).val();
+      if (inputs[type] == undefined) inputs[type] = []; 
+      inputs[type].push({id: id, value:value});
+    });
+    return inputs;
+  }
+
+  function onReturn(inputs, feedback) {
+    // change title, replace submit button by navigation
+    $( "#enonce" ).toggle();
+    $( "#corrige" ).toggle();
+    $( "#submit_div" ).toggle();
+    $( "#navigation_div" ).toggle();
+    
+    // Paint input fields
+    Paint(inputs);
+    
+    // show feedback
     $( "#feedback_div" ).html(feedback);
     // typeset math in feedback before displaying it
     MathJax.Hub.Queue(["Typeset",MathJax.Hub,feedback_div]);
-    $( "#feedback_div" ).toggle();
-    $( "#submit_div" ).toggle();
-    $( "#navigation_div" ).toggle();
+    $(":animated").promise().done(function(){
+    // will be called when all the animations on the queue finish
+      $( "#feedback_div").show(1500);
+    });
 
-    // change title
-    $( "#enonce" ).toggle();
-    $( "#corrige" ).toggle();
   }
 
   $( "#submit_button" ).click(function() {
-    // get values from input fields
-    var inputs = [];
-    // id is of the form 'form_typ_name'
-    $( "[id^='form_']" ).each(function() {
-      var type = this.id.slice(5,8); // type of field, a 3 letter code, cf input tag defs
-      var name = this.id.slice(9); // name of the variable
-      var value = $(this).val();
-      var input = {type: type, name: name, value:value};
-      inputs.push(input);
-    });
+    var inputs = getInputs();
 
     var status = {requested_action: 'submit', inputs: inputs, pk: {{ pk|tojson }} };
     $.ajax({
@@ -70,7 +94,7 @@ $( document ).ready(function(){
       contentType: 'application/json;charset=UTF-8',
       success: function(returned_status) {
         status = returned_status;
-        onSubmit(status.inputs, status.feedback);
+        onReturn(status.inputs, status.feedback);
       }
     });
   });

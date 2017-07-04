@@ -1,5 +1,4 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from django.urls import reverse
+﻿from django.shortcuts import render, get_object_or_404, redirect
 from django.template import Template, Context
 from django.http import HttpResponse, HttpResponseRedirect
 import json
@@ -25,7 +24,6 @@ def liste_exos(request):
 def delete_exo(request, pk):
 	exo = get_object_or_404(Exo, pk=pk)
 	exo.delete()
-	exos = Exo.objects.all().order_by('title')
 	return redirect('liste_exos')
 
 def run_exo_ajax(request, pk):
@@ -65,24 +63,29 @@ def run_exo_ajax(request, pk):
 				dictionnaire = request.session['current_exo_dict']
 			# add user-input to the dictionary
 			# print('FORM DATA\n\n', status['inputs'], '\n\n')
-			for input in status['inputs'] :
-				dictionnaire[input['name']] = input['value']
+			#for input in status['inputs'] :
+			#	dictionnaire[input['name']] = input['value']
+			for type in status['inputs'] :
+			    for input in status['inputs'][type] :
+			        dictionnaire[input['id']] = input['value']
 
 			# on ajoute/modifie des données au dictionnaire par l'exécution de 'après'
 			# print('DICTIONNAIRE\n\n', dictionnaire, '\n\n')
 			dictionnaire = exo.exec_apres(dictionnaire)
 			ok_answer = dictionnaire['ok_answer']
 
-			for input in status['inputs'] :
-				if (input['name'] in ok_answer) and (ok_answer[input['name']] == True) :
-					input['style'] = "good_answer"
-				elif (input['name'] in ok_answer) and (ok_answer[input['name']] == False) :
-					input['style'] = "wrong_answer"
-				# except for geogebra object, not good means wrong
-				elif (input['type'] != 'ggb') :
-					input['style'] = "wrong_answer"
-				# for geogebra objects, not good means nothing (otherwise most would be wrong)
-				else: input['style'] = "other"
+			#for input in status['inputs'] :
+			for type in status['inputs'] :
+			    for input in status['inputs'][type] :
+    				if (input['id'] in ok_answer) and (ok_answer[input['id']] == True) :
+    					input['style'] = "good_answer"
+    				elif (input['id'] in ok_answer) and (ok_answer[input['id']] == False) :
+    					input['style'] = "wrong_answer"
+    				# except for geogebra object, not good means wrong
+    				elif (type != 'ggb') :
+    					input['style'] = "wrong_answer"
+    				# for geogebra objects, not good means nothing (otherwise most would be wrong)
+    				else: input['style'] = "other"
 
 			contexte = for_template(dictionnaire)
 			status['feedback'] = Template(exo.reponse).render(Context(contexte))

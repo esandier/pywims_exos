@@ -1,3 +1,5 @@
-
-<input class='input' id ='form_txt_{{ name }}' style='{{ style }}'>
-<!-- <span  id ='display_txt_{{ name }}' style='display:none'></span> -->
+<!-- Phantom prevents animations from disrupting page layout -->
+<span style = 'display:inline-block;'>
+<input class='input absolute' id ='form_txt_{{ name }}' style='{{ style }}'/>
+<input class='input phantom' id ='phantom_txt_{{ name }}' style='{{ style }}' disabled = 'disabled'/>
+</span>

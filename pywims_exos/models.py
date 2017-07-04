@@ -1,4 +1,4 @@
-from django.db import models
+﻿from django.db import models
 from django.conf import settings
 from django.template import Template, Context
 import os
@@ -7,7 +7,7 @@ from sympy import *
 from random import *
 import  math
 from .fonctions import *
-from django.core.files import File
+#from django.core.files import File
 
 
 def execution(code_string, dictionnaire):
