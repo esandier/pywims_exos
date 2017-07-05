@@ -72,12 +72,58 @@ class Exo(models.Model):
 		return settings.LAYOUTS_DIRECTORY+'/'+self.layouts_corrige[self.layout]
 
 	def exec_avant(self, dictionnaire):
-		return execution(self.avant, dictionnaire)
+	    result = {}
+	    # dictionary of variabes set by 'avant' code
+	    result['dic'] = execution(self.avant, dictionnaire)
+	    # the template context gets a formatted version ...
+	    result['context'] = for_template(result['dic'])
 
-	def exec_apres(self, dictionnaire):
+	    # addition for geogebra layout: ... and some geogebra data, if present
+	    if self.layout == 'GGB':
+		    result['context']['ggb_commands'] = self.exec_ggb(result['dic'])
+		    result['context']['ggb_file'] = self.ggb_file
+		    
+	    return result
+
+	def exec_apres(self, dic, inputs):
+		for type in inputs :
+		    for input in inputs[type] :
+		        dic[input['id']] = input['value']
+
 		# On ajoute comme variable le dictionnaire 'ok_answer', qui peut ête renseigné dans le corrigé
-		dictionnaire['ok_answer'] = {}
-		return execution(self.apres, dictionnaire)
+		dic['ok_answer'] = {}
+
+		# on ajoute/modifie des données au dictionnaire par l'exécution de 'après'
+		# print('DICTIONNAIRE\n\n', dictionnaire, '\n\n')
+		dic = execution(self.apres, dic)
+		ok_answer = dic['ok_answer']
+
+		#for input in status['inputs'] :
+		for type in inputs :
+		    for input in inputs[type] :
+		        if (input['id'] in ok_answer) and (ok_answer[input['id']] == True) :
+		            input['style'] = "good_answer"
+
+		        # except for geogebra objects, not good means wrong
+		        else : input['style'] = "wrong_answer"
+		# addition for geogebra layout
+		if 'ggb' in inputs :
+		    for input in inputs['ggb'] :
+    				if (input['id'] in ok_answer) and (ok_answer[input['id']] == True) :
+    					input['style'] = "good_answer"
+    				elif (input['id'] in ok_answer) and (ok_answer[input['id']] == False) :
+    					input['style'] = "wrong_answer"
+    				# for geogebra objects, not good means nothing (otherwise most would be wrong)
+    				else: input['style'] = "other"
+				
+		result = {}
+		result['feedback'] = Template(self.reponse).render(Context(for_template(dic)))
+		result['inputs'] = inputs
+
+		return result
+		
+		
+		
 	# renvoie les commandes geogebra avec les variables python remplacées par leurs valeurs
 	# il faut enlever les lignes blanches qui provoquent un message d'erreur dans l'applet geogebra
 	def exec_ggb(self, dictionnaire):

@@ -27,31 +27,13 @@
       <button class = 'input' id = "again_button" value=Recommencer> Recommencer </button>
     </a>
   </div>
-  <div class='feedback' id = "feedback_div" style = 'display: none'></div>
+  <div class='feedback' id = "feedback_div" style = 'opacity: 0'></div>
 </div>
 
 <!--  script executed after page is loaded -->
 
 <script>
 $( document ).ready(function(){
-    (function ( $ ) {
-      $.fn.styling = function(type, style) {
-        var color = '';
-        var object = this;
-        if (type != 'drg') this.attr('disabled', 'disabled');
-        if (style === 'wrong_answer') color = "LightPink";
-        if (style === 'good_answer') color = "LightGreen";
-        this.animate({width: 'toggle'},function(){
-          object.css("background-color", color)
-          object.animate({width: 'toggle'});
-        });
-        return this;
-      };
-  }( jQuery ));
-
-
-
-    
   if(window.top != window.self) {
     $('#home-link').remove();
   }
@@ -79,6 +61,21 @@ $( document ).ready(function(){
 <!-- Javascript of the standard Pywims exercise layout -->
 
 <script>
+  (function ( $ ) {
+      $.fn.styling = function(type, style) {
+        var color = '';
+        var object = this;
+        if (style === 'wrong_answer') color = "LightPink";
+        if (style === 'good_answer') color = "LightGreen";
+        this.animate({width: 'toggle'},function(){
+          object.css("background-color", color)
+          object.animate({width: 'toggle'});
+          if (type != 'drg') object.attr('disabled', 'disabled');
+        });
+        return this;
+      };
+  }( jQuery ));
+
   function paint(inputs) {
     console.log('inputs ', inputs);
     if (inputs['txt'] != undefined)
@@ -131,9 +128,8 @@ $( document ).ready(function(){
     MathJax.Hub.Queue(["Typeset",MathJax.Hub,feedback_div]);
     $(":animated").promise().done(function(){
     // will be called when all the animations on the queue finish
-      $( "#feedback_div").show(1500);
+      $( "#feedback_div").css('animation', 'growIn 2s forwards');
     });
-
   }
 </script>
 
@@ -141,6 +137,7 @@ $( document ).ready(function(){
 
 <script type="text/javascript" src="https://cdn.geogebra.org/apps/deployggb.js"></script>
 <script type="text/javascript">
+    // parameters of the geogebra app
 	var parameters = {
 		"prerelease":false,
 		"width":500,
@@ -168,10 +165,9 @@ $( document ).ready(function(){
 	
 	// Geogebra applet creation
     applet.inject('ggb_applet_container', 'preferHTML5');
-
-
+    
+    // fetches each geogebra object "name" and stores it as a pair {id : ggb_name, value: value}
 	function ggbValues() {
-		// remplit les champs 'ggb_input_??' par une valeur obtenue de l'applet geogebra
 		var n = ggbApplet.getObjectNumber();
 		var values = [];
 		for (var i = 1; i < n+1; i++){
@@ -181,6 +177,9 @@ $( document ).ready(function(){
 		}
 		return values;
 	}
+    
+
+    // Painting of a geogebra object
 	function ggbStyling(id, style){
 		// console.log('id : ', id, ', style:', style);
 		if (style === 'wrong_answer') ggbApplet.setColor(id, 255,0,0);
@@ -190,8 +189,8 @@ $( document ).ready(function(){
 	}
 	
 	
-	// Override functions getInputs() and paint(inputs so that they fetch
-	// geogebra values and paint geogebra
+	// Override functions getInputs() and paint(inputs) so that they fetch
+	// geogebra values and paint geogebra objects, respectively
 	
 	var standardPaint = paint;
     paint = function(inputs) {
@@ -199,6 +198,7 @@ $( document ).ready(function(){
         if (inputs['ggb'] != undefined)
         for(var i = 0; i < inputs['ggb'].length; i++){
             var input = inputs['ggb'][i];
+            // the id of the geogebra objects is "ggb_name", cf function ggbValues()
             ggbStyling(input.id.slice(4), input.style);
         }
     };

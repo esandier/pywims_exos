@@ -33,17 +33,13 @@ def run_exo_ajax(request, pk):
 		exo = get_object_or_404(Exo, pk=pk)
 		# On récupère le dictionnaire des variables de l'exo après execution de 'avant'
 		# et on le stocke dans request.session
-		dictionnaire = exo.exec_avant({})
-		request.session['current_exo_dict'] = dictionnaire
+		result = exo.exec_avant({})
+		request.session['current_exo_dict'] = result['dic']
 		# Le dictionnaire envoyé au template doit être modifié:
 		# les expressions sympy sont transformées en Latex par la fonction for_template
-		contexte = for_template(dictionnaire)
+		contexte = result['context']
 		# on ajoute la primary key de l'exo, utilisée quand on redirige vers la vue 'corrigé'
 		contexte['pk'] = pk
-		# Intégration géogebra.
-		if (exo.layout == 'GGB') :
-			contexte['ggb_commands'] = exo.exec_ggb(dictionnaire)
-			contexte['ggb_file'] = exo.ggb_file
 
 		string = "{% extends '" + exo.layout_enonce() + "' %}\n {% load input_fields_ajax %}\n"\
 		+ '{% block enonce_exo %}\n'+ exo.enonce + '\n{% endblock %}'
@@ -65,32 +61,13 @@ def run_exo_ajax(request, pk):
 			# print('FORM DATA\n\n', status['inputs'], '\n\n')
 			#for input in status['inputs'] :
 			#	dictionnaire[input['name']] = input['value']
-			for type in status['inputs'] :
-			    for input in status['inputs'][type] :
-			        dictionnaire[input['id']] = input['value']
 
 			# on ajoute/modifie des données au dictionnaire par l'exécution de 'après'
 			# print('DICTIONNAIRE\n\n', dictionnaire, '\n\n')
-			dictionnaire = exo.exec_apres(dictionnaire)
-			ok_answer = dictionnaire['ok_answer']
-
-			#for input in status['inputs'] :
-			for type in status['inputs'] :
-			    for input in status['inputs'][type] :
-    				if (input['id'] in ok_answer) and (ok_answer[input['id']] == True) :
-    					input['style'] = "good_answer"
-    				elif (input['id'] in ok_answer) and (ok_answer[input['id']] == False) :
-    					input['style'] = "wrong_answer"
-    				# except for geogebra object, not good means wrong
-    				elif (type != 'ggb') :
-    					input['style'] = "wrong_answer"
-    				# for geogebra objects, not good means nothing (otherwise most would be wrong)
-    				else: input['style'] = "other"
-
-			contexte = for_template(dictionnaire)
-			status['feedback'] = Template(exo.reponse).render(Context(contexte))
+			result = exo.exec_apres(dictionnaire, status['inputs'])
+            
 			# print('RETURNED STATUS\n\n',status,'\n\n')
-			return HttpResponse(json.dumps(status), content_type='application/json')
+			return HttpResponse(json.dumps(result), content_type='application/json')
 # OBSOLETE
 def run_exo(request, pk):
 	# pk = primary_key de l'exo dans la base de donnée, on le stocke dans le
