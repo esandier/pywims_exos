@@ -5,27 +5,37 @@
 
 {% block contenu %}
 
-<div class = 'titre'>
-  <h1 id="enonce">PyWims, énoncé</h1>
-  <h1 id="corrige" style = 'display: none'>PyWims, corrigé</h1>
-  <a id='home-link' href="/" class="glyph"><span class="fa fa-home"></span></a>
+
+<div class = 'row'>
+    <div class = 'col'>
+        <div class = 'titre'>
+            <h1 id="enonce"> {{ exo_title }} - Enoncé </h1>
+            <h1 id="corrige" style = 'display: none'>{{ exo_title }} - Corrigé</h1>
+            <a id='home-link' href="/" class="glyph"><span class="fa fa-home"></span></a>
+        </div>
+    </div>
 </div>
 
-<div class='exo'>
-  <div class='form-enonce'>
+<div class='row justify-content-center'>
+    <div class='col-10'>
     {% block enonce_exo %}{% endblock %}
-  </div>
-
-  <div class = validation-enonce id = "submit_div">
-    <button class = 'input'  id = "submit_button" value=Valider> Valider </button>
-  </div>
-  <div class = validation-enonce id = "navigation_div" style = 'display: none'>
-    <a href = "{% url 'run_exo_ajax' pk=pk %}">
-      <button class = 'input' id = "again_button" value=Recommencer> Recommencer </button>
-    </a>
-  </div>
-  <div class='feedback' id = "feedback_div" style = 'opacity: 0'></div>
+    </div>
 </div>
+
+<div class='row'>
+    <div class='col'>
+        <div class = validation-enonce id = "submit_div">
+            <button class = 'input'  id = "submit_button" value=Valider> Valider </button>
+        </div>
+        <div class = validation-enonce id = "navigation_div" style = 'display: none'>
+            <a href = "{% url 'run_exo_ajax' pk=pk %}">
+                <button class = 'input' id = "again_button" value=Recommencer> Recommencer </button>
+            </a>
+        </div>
+        <div class='feedback' id = "feedback_div" style = 'opacity: 0'></div>
+    </div>
+</div>
+
 
 
 <!--  script executed after page is loaded -->

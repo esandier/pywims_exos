@@ -1,4 +1,4 @@
-{% extends "pywims_exos/layout_appli.html" %}
+﻿{% extends "pywims_exos/layout_appli.html" %}
 {% load json_filter %}
 {% block contenu  %}
 
@@ -45,39 +45,34 @@ $( document ).ready(function(){
     });
   });
 
-  // rendre le titre de l'exo modifiable
-  $( "#titre-pencil" ).on( "click", function() {
-     if ($( "#titre" ).attr('contentEditable') != 'true') {
-       $( "#titre" ).attr('contentEditable', 'true');
-       $( "#titre" ).css({"border-color": "#white",
-              "border-width":"1px",
-              "border-style":"solid"});
-     }
-     $( "#titre" ).focus();
-   });
+  // rendre le titre de l'exo modifiable (nouvelle version)
+  
+    $( document ).on('click', ".editable-label",  function () {
+        var input = $('<input />', {'type': 'text', 'id': this.id, 'class': 'editable-input', 'value': $(this).val()});
+        $(this).parent().append(input);
+        $(this).remove();
+        input.focus();
+    });
 
-   $( "#titre" ).bind('keypress', function(e) {
+    $(document ).on('blur',  ".editable-input", function () {
+        var label = $('<input />', {'id': this.id, 'class': 'editable-label', 'value': $(this).val(), 'disable':'disable'});
+        $(this).parent().append(label);
+        status.exo[this.id] = $( this ).val(); // The id of the input element is also the name of the property of the Exo class 
+        $(this).remove();
+    });
+    
+   $( document ).on('keypress', '.editable-input', function(e) {
      var code = e.keyCode || e.which;
 
      if ((code == 13) || (code == 27)) {
-       $( "#titre" ).attr('contentEditable', 'false');
-       $( "#titre" ).css({'border': 'none'});
+        var label = $('<input />', {'id': this.id, 'class': 'editable-label', 'value': $(this).val(), 'disable':'disable'});
+        $(this).parent().append(label);
+        status.exo[this.id] = $( this ).val();
+        $(this).remove();
      }
-
-     if (code == 13) {  // touche enter : on enregistre le nouveau titre
-       status.exo['title'] = $( "#titre" ).html();
-       status['requested_action'] = 'update-title';
-       $.ajax({
-         type : "POST",
-         url : "{% url 'dev_exo' pk=pk %}",
-         data: JSON.stringify(status, null, '\t'),
-         contentType: 'application/json;charset=UTF-8',
-         success: function(returned_status) {}
-       });
-     }
-     // touche escape : on revient au titre initial
-     if (code == 27) $( "#titre" ).html(status.exo['title']);
    });
+    
+
 
 });
 </script>
@@ -85,19 +80,23 @@ $( document ).ready(function(){
 <div class="container-fluid h-100">
   <div class="row">
     <div class="col-7 d-flex flex-column align-items-stretch" style = "background-color:plum; padding:0px 7px 0px 0px">
-      <div class = "row dev-top">
+      <div class = "row">
         <div class = 'col'>
-          <div class = 'dev-titre' id = 'titre'> {{ status.exo.title }} </div>
-          <div class = 'dev-titre'><span class="fa fa-pencil" id = 'titre-pencil'></span></div>
-
-          <!-- Nav tabs -->
-          <ul class="nav nav-tabs" role="tablist">
-            {% for block in block_list %}
-            <li class="nav-item">
-              <a class="nav-link" data-toggle="tab" href="#edit_{{ block.name }}" role="tab">{{ block.label }}</a>
+<!--          <div class = 'dev-titre' id = 'titre'> {{ status.exo.title }} </div>
+          <div class = 'dev-titre'><span class="fa fa-pencil" id = 'titre-pencil'></span></div> 
+  -->
+<!-- Phantom prevents animations from disrupting page layout -->
+            <div class = 'editable-outer'>
+                <input class='editable-label' id = 'title' value ="{{ status.exo.title }}">
+            </div>
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs noborder" role="tablist">
+                {% for block in block_list %}
+                <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#edit_{{ block.name }}" role="tab">{{ block.label }}</a>
             </li>
             {% endfor %}
-          </ul>
+            </ul>
         </div>
         <div class = 'col-md-auto d-flex align-items-center'>
           <button class=  'dev-glyph' type="button" id='home_button'><span class="fa fa-home"></span></button>

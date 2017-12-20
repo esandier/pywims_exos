@@ -1,9 +1,0 @@
-<div class = 'source' style = '{{ style_boite }}'>
-		<div class = 'drag-contenu' id='{{ name }}'  style = '{{ style_contenu }}'> {{ display }} </div>
-</div>
-
-{% if drag_it == True %}
-	<script>
-		document.getElementById("{{ destination }}").appendChild(document.getElementById('{{ name }}'));
-	</script>
-{% endif %}

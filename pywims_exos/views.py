@@ -40,6 +40,9 @@ def run_exo_ajax(request, pk):
 		contexte = result['context']
 		# on ajoute la primary key de l'exo, utilisée quand on redirige vers la vue 'corrigé'
 		contexte['pk'] = pk
+		# on ajoute le titre de l'exo, utilisé dans l'affichage
+		contexte['exo_title'] = exo.title
+		
 
 		string = "{% extends '" + exo.layout_enonce() + "' %}\n {% load input_fields_ajax %}\n"\
 		+ '{% block enonce_exo %}\n'+ exo.enonce + '\n{% endblock %}'

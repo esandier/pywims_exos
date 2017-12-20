@@ -1,22 +1,31 @@
 Geogebra :
-	- Ajouter le traitement de ok_answer: colorie en vert ou en rouge l'objet.
 	- Améliorer le layout: enoncé à gauche, applet à droite.
 
+Templates :
+    - créer plus de types d'inputs pour les entiers, fractions irréductibles, réels, etc...
+
+Codes Avant et Après :
+    - garder les préfixes des librairies : sympy, random, maths, scipy, etc...
+    - vérifier is_equal, qui ne marche pas avec l'exo tangent plane.
+
 Corrige :
-		- Faire de la validation et signaler les inputs incompréhensibles ou ne correspondant
+	- Faire de la validation et signaler les inputs incompréhensibles ou ne correspondant
 	pas à ce qui est demandé (nombre ou fraction irreductible, par exemple).
 
 Exo appelable :
 	- Faire qu'un exo puisse être appelé, éventuellement avec un contexte.
 	- Faire que l'exo renvoie un contexte. Possibilité de définir ce contexte dans l'exo.
+	- Implémenter les exos à questions, étudier l'affichage d'un tel truc, remplacement par une nouvelle question, ou ajout à la suite, ou swipe?
 
 Hyperliens définition :
 	- Possibilité qu'un terme utilisé dans l'exo (matrice, dérivée, ...) puisse être un hyperlien,
 	le dictionnaire ne devant pas nécessairement être défini par l'auteur, mais pouvant l'être.
 
 Mode dev :
-	- Pour le titre éditable : utiliser un champ input, contenteditable déconne avec Chrome.
+	- remplacer le hamburger par un choix du type d'exo dans la page editeur
 	- Compléter : Si le type de l'exo est modifié en Geogebra, demander un fichier à uploader
+	- Capturer l'output de la console python. Idéalement avoir un debugger du style Google sheets.
+	- faire de l'ajout d'image facile (voir avec le projet du mec qui fait WIMS WYSIWYG)
 	- Ajouter un onglet formulaire avec les paramètres et métadonnées de l'exo.
 	permettre d'uploader des fichiers associés à l'exo.
 	- Ajouter un onglet par fichier associé à l'exo, qui appelle dans le volet éditeur
@@ -25,5 +34,13 @@ Mode dev :
 	texte?
 
 Général :
+	- Angliciser le code, les commentaires et la syntaxe. 
 	- Améliorer la sécurité. Limiter les keywords Python utilisables. Interdire
 	javascript dans les templates, etc...
+	
+	
+Documentation 
+
+Dans les templates, attention de ne pas mettre d'espace entre l'argument positionel et sa valeur: style='truc' et pas: style = 'truc'
+
+

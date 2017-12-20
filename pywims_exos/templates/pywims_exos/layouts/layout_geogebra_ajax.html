@@ -5,29 +5,36 @@
 
 {% block contenu %}
 
-<div class = 'titre'>
-  <h1 id="enonce">PyWims, énoncé</h1>
-  <h1 id="corrige" style = 'display: none'>PyWims, corrigé</h1>
-  <a id='home-link' href="/" class="glyph"><span class="fa fa-home"></span></a>
+<div class = 'row'>
+    <div class = 'col'>
+        <div class = 'titre'>
+            <h1 id="enonce"> {{ exo_title }} - Enoncé </h1>
+            <h1 id="corrige" style = 'display: none'>{{ exo_title }} - Corrigé</h1>
+            <a id='home-link' href="/" class="glyph"><span class="fa fa-home"></span></a>
+        </div>
+    </div>
 </div>
 
-<div id='ggb_applet_container' class='ggb_applet_container'></div>
-
-
-<div class='exo'>
-  <div class='form-enonce'>
+<div class='row justify-content-center'>
+    <div class = 'col-auto' id='ggb_applet_container'></div>
+    <div class = 'col-1'></div>
+    <div class='col-auto'>
     {% block enonce_exo %}{% endblock %}
-  </div>
+    </div>
+</div>
 
-  <div class = validation-enonce id = "submit_div">
-    <button class = 'input'  id = "submit_button" value=Valider> Valider </button>
-  </div>
-  <div class = validation-enonce id = "navigation_div" style = 'display: none'>
-    <a href = "{% url 'run_exo_ajax' pk=pk %}">
-      <button class = 'input' id = "again_button" value=Recommencer> Recommencer </button>
-    </a>
-  </div>
-  <div class='feedback' id = "feedback_div" style = 'opacity: 0'></div>
+<div class='row'>
+    <div class='col'>
+        <div class = validation-enonce id = "submit_div">
+            <button class = 'input'  id = "submit_button" value=Valider> Valider </button>
+        </div>
+        <div class = validation-enonce id = "navigation_div" style = 'display: none'>
+            <a href = "{% url 'run_exo_ajax' pk=pk %}">
+                <button class = 'input' id = "again_button" value=Recommencer> Recommencer </button>
+            </a>
+        </div>
+        <div class='feedback' id = "feedback_div" style = 'opacity: 0'></div>
+    </div>
 </div>
 
 <!--  script executed after page is loaded -->
@@ -139,30 +146,32 @@ $( document ).ready(function(){
 <script type="text/javascript">
     // parameters of the geogebra app
 	var parameters = {
+	    "id":"ggbApplet",
 		"prerelease":false,
-		"width":500,
-		"height":300,
+		"width":350,
+		"height":350,
 		"showToolBar":false,
 		"borderColor":"#FFFFFF",
 		"showMenuBar":false,
 		"showAlgebraInput":false,
  		"showResetIcon":false,
-//		"enableLabelDrags":false,
+////		"enableLabelDrags":false,
 		"enableShiftDragZoom":true,
-		"enableRightClick":false,
+//		"enableRightClick":false, // apparently prevents 3D display if uncommented
 		"capturingThreshold":null,
 		"showToolBarHelp":false,
  		"errorDialogsActive":true,
-//		"useBrowserForJS":true,
+////		"useBrowserForJS":true,
+        "langage":"en",
  		"filename":"{{ ggb_file.url }}"
 	};
-
 	parameters.appletOnLoad = function() {
 		var commandes = {{ ggb_commands|tojson }};
 		if (commandes != '')	ggbApplet.evalCommand(commandes);
 	}
 	var applet = new GGBApplet('5.0', parameters);
-	
+    applet.setHTML5Codebase('https://app.geogebra.org/5.0/web3d/');
+
 	// Geogebra applet creation
     applet.inject('ggb_applet_container', 'preferHTML5');
     

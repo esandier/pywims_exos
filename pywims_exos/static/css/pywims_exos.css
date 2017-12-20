@@ -23,7 +23,7 @@ div.titre h1, div.titre h1 a, div.titre h1 a:visited, div.titre h1 a:active {
 div.titre {
 	background-color: #ff9400;
 	margin-top: 0;
-  margin-bottom: 20px;
+    margin-bottom: 20px;
 	padding: 10px 10px 10px 20px;
 	display:flex;
 	justify-content: space-between;
@@ -55,18 +55,13 @@ div.item-liste h1, input.item-liste {
 	float: left;
 	font-size: 18pt;
 	margin-right: 10px;
-	align-self:top;
+	align-self:flex-start;
 }
 
-/* Conteneur de l'applet geogebra */
-
-div.ggb_applet_container{
-  padding-left: 20px;
-}
 
 /* View mode développement: conteneur des deux volets */
 
-div.dev_exos {
+.dev_exos {
 	background: #eee;
 	display :flex;
 	justify-content:center;
@@ -78,7 +73,7 @@ div.dev_exos {
 
 /* View mode développement : volet éditeur */
 
-div.dev-volet-editeur {/* OBSOLETE */
+.dev-volet-editeur {/* OBSOLETE */
 	flex:1.6;
 	display:flex;
 	flex-direction:column;
@@ -88,18 +83,18 @@ div.dev-volet-editeur {/* OBSOLETE */
 	border-right: 4px solid Plum;
 }
 
-div.dev-menu {/* OBSOLETE */
+.dev-menu {/* OBSOLETE */
 	display:flex;
  	background:Plum;
  	font-size: 12px;
 	justify-content: space-between;
 }
 
-div.editeur {/* OBSOLETE */
-	height:100%;
+.editeur {/* OBSOLETE */
+    height:100%;
 	background: White;
-  border-top:1px solid Black;
-  border-right:1px solid Black;
+    border-top:1px solid Black;
+    border-right:1px solid Black;
 }
 
 button.dev-onglet, button.dev-onglet-sel {/* OBSOLETE */
@@ -131,11 +126,11 @@ button.dev-titre, span.dev-titre { /* titre de l'exo */
 
 /* View mode développement : volet preview exo */
 
-iframe.exo {
-  margin:none;
+.exo {
+  margin:0;
   border:none;
-  padding:0px 0px 0px 0px;
-	height:100vh;
+  padding:0;
+  height:100vh;
   width:100%;
 }
 
@@ -225,7 +220,7 @@ div.source  {
 }
 .drag-contenu {
 	display:flex;
-  position:absolute;
+    position:absolute;
 	background:inherit;
 	height:inherit;
 	width:inherit;
@@ -234,27 +229,54 @@ div.source  {
 	text-align:center;
 	font-size: 1em;
 }
-span.bonne_reponse {/* OBSOLETE */
-	background:LightGreen;
-}
-span.mauvaise_reponse {/* OBSOLETE */
-	background:LightPink;
-}
-
 
 /* Menu développement bootstrap */
+.editable-outer {
+    position: relative;
+    padding:7px 7px 7px 7px;
+    background:inherit;
+    width:250px;
+    }
+
+.editable-label {
+    display: inline-block;
+    font: inherit;
+    margin: 0;
+    white-space: pre;
+    background:inherit;
+    width:inherit;
+    border:1px solid transparent;
+    overflow: hidden;
+    text-overflow: ellipsis;
+   }
+
+.editable-input {
+    display: inline-block;
+    font: inherit;
+    margin: 0;
+    white-space: pre;
+    width:inherit;
+    border:1px solid white;
+    background:inherit;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+}
+
+
+.noborder {
+    border:none;
+}
+
 div.dev-titre { /* titre de l'exo */
-  display:inline-block;
-  margin:5px;
-	font-size:12pt;
-  color:white;
-  white-space: pre; /* nécessaire pour pouvoir enter des espaces */
+    display:inline-block;
+    margin:5px;
+    font-size:1.2em;
+    color:white;
+    white-space: pre; /* nécessaire pour pouvoir enter des espaces */
 }
 
-div.dev-top {
-}
-
-div.edit-pane {
+.edit-pane {
   height:100%;
 }
 
