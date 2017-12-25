@@ -46,10 +46,12 @@ $( document ).ready(function(){
 		<div class="col"  id = 'liste-exos'>
 			{% for exo in exos %}
 			<div class = 'item-liste'>
+				{% if user.is_authenticated %}
 				<a href="{% url 'form_exo' pk=exo.pk %}" class="list-glyph">
 					<span class="fa fa-bars"></span></a>
 				<a href="{% url 'delete_exo' pk=exo.pk %}" class="list-glyph">
 					<span class="fa fa-trash"></span></a>
+				{% endif %}
 				<a href="{% url 'dev_exo' pk=exo.pk %}" class="list-glyph">
 					<span class="fa fa-pencil"></span></a>
 				<div style = 'display:inline-block'>
