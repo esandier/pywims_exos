@@ -34,9 +34,9 @@ def run_exo_ajax(request, pk):
 		# On récupère le dictionnaire des variables de l'exo après execution de 'avant'
 		# et on le stocke dans request.session
 		result = exo.exec_avant({})
+		# result['dic'] is the python dictionary resulting from the execution of 'avant'
 		request.session['current_exo_dict'] = result['dic']
-		# Le dictionnaire envoyé au template doit être modifié:
-		# les expressions sympy sont transformées en Latex par la fonction for_template
+		# result['context'] is a formatted version of result['dic'] suitable for use in a template
 		contexte = result['context']
 		# on ajoute la primary key de l'exo, utilisée quand on redirige vers la vue 'corrigé'
 		contexte['pk'] = pk

@@ -17,7 +17,6 @@
 
 <div class='row justify-content-center'>
     <div class = 'col-auto' id='ggb_applet_container'></div>
-    <div class = 'col-1'></div>
     <div class='col-auto'>
     {% block enonce_exo %}{% endblock %}
     </div>
@@ -36,6 +35,7 @@
         <div class='feedback' id = "feedback_div" style = 'opacity: 0'></div>
     </div>
 </div>
+
 
 <!--  script executed after page is loaded -->
 
@@ -84,17 +84,18 @@ $( document ).ready(function(){
   }( jQuery ));
 
   function paint(inputs) {
-    console.log('inputs ', inputs);
     if (inputs['txt'] != undefined)
     for(var i = 0; i < inputs['txt'].length; i++){
       var input = inputs['txt'][i];
-      $( "#form_txt_"+input.id ).styling('txt', input.style);
+      // this syntax allows for brackets in the element id, useful for arrays
+      $(document.getElementById("form_txt_"+input.id )).styling('txt', input.style);
     }
     
     if (inputs['sel'] != undefined)
     for(var i = 0; i < inputs['sel'].length; i++){
       var input = inputs['sel'][i];
-      $( "#form_sel_"+input.id ).styling('sel', input.style);
+      // this syntax allows for brackets in the element id, useful for arrays
+      $(document.getElementById("form_sel_"+input.id )).styling('sel', input.style);
     }
     if (inputs['drg'] != undefined)
     for(var i = 0; i < inputs['drg'].length; i++){
@@ -103,7 +104,7 @@ $( document ).ready(function(){
       if ((input.value.slice(0,7) == 'origin_') || (input.value == '')) continue;
       // in drag fields, the element to be painted is not the input element, which is hidden
       // its id is simply "name", whereas the input's id is "form_drg_name"
-      $( "#"+input.id ).styling('drg', input.style);
+      $(document.getElementById( input.id )).styling('drg', input.style);
     }
   }
   
@@ -146,32 +147,32 @@ $( document ).ready(function(){
 <script type="text/javascript">
     // parameters of the geogebra app
 	var parameters = {
-	    "id":"ggbApplet",
 		"prerelease":false,
-		"width":350,
-		"height":350,
+		"width":500,
+		"height":300,
 		"showToolBar":false,
 		"borderColor":"#FFFFFF",
 		"showMenuBar":false,
 		"showAlgebraInput":false,
  		"showResetIcon":false,
-////		"enableLabelDrags":false,
+//		"enableLabelDrags":false,
 		"enableShiftDragZoom":true,
-//		"enableRightClick":false, // apparently prevents 3D display if uncommented
+		"enableRightClick":false,
 		"capturingThreshold":null,
 		"showToolBarHelp":false,
  		"errorDialogsActive":true,
-////		"useBrowserForJS":true,
+//		"useBrowserForJS":true,
         "langage":"en",
+        "enable3D":true,
  		"filename":"{{ ggb_file.url }}"
 	};
+
 	parameters.appletOnLoad = function() {
 		var commandes = {{ ggb_commands|tojson }};
 		if (commandes != '')	ggbApplet.evalCommand(commandes);
 	}
 	var applet = new GGBApplet('5.0', parameters);
-    applet.setHTML5Codebase('https://app.geogebra.org/5.0/web3d/');
-
+	
 	// Geogebra applet creation
     applet.inject('ggb_applet_container', 'preferHTML5');
     

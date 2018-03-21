@@ -1,0 +1,15 @@
+<!-- hidden input declares the matrix so it can be later populated -->
+<input type = 'hidden' id = 'form_dec_{{ name }}' value = '[[0 for x in {{ rangelines }}] for y in {{ rangecols }}]'/>
+<table>
+{% for i in rangelines %}
+<tr>
+    {% for j in rangecols %}
+    <td>
+        <input class='input absolute' id ='form_txt_{{ name }}[{{i}}][{{j}}]' style='{{ style_cell }}'/>
+        <!-- Phantom prevents animations from disrupting page layout -->
+        <input class='input phantom' id ='phantom_txt_{{ name }}[{{i}}][{{j}}]' style='{{ style_cell }}' disabled = 'disabled'/>
+    </td>
+    {% endfor %}
+</tr>
+{% endfor %}
+</table>
