@@ -38,6 +38,7 @@ def run_exo_ajax(request, pk):
 		request.session['current_exo_dict'] = result['dic']
 		# result['context'] is a formatted version of result['dic'] suitable for use in a template
 		contexte = result['context']
+		contexte['current_exo_dict'] = result['dic']
 		# on ajoute la primary key de l'exo, utilisée quand on redirige vers la vue 'corrigé'
 		contexte['pk'] = pk
 		# on ajoute le titre de l'exo, utilisé dans l'affichage

@@ -16,24 +16,32 @@ def execution(code_string, dictionnaire, inputs=[], declarations = []):
 # {'id':'a[1]', 'value':37}
 # puis renvoie un dictionnaire de toutes les variables locales (définies dans 'dictionnaire' et définies par 'code_string')
     class Code:
-        def __init__(self, dictionnaire, inputs):
+        def __init__(self, dictionnaire, inputs, declarations):
             # for declarations, 'value' must be executed as a python statement
-            # not put between quotes to make a string value
+            # not put between quotes.
+            print('avant declarations','\n\n')
+
             for v in declarations:
                 exec(v['id']+'='+v['value'])
             # dictionnaire is made available as python variables
+            print('avant dictionnaire','\n\n')
             for v in dictionnaire : 
                 exec(v+'=dictionnaire["'+v+'"]')
             # for inputs, the 'id' is executed as a python statement, useful for assignements like 'a[1] = something'
-            # the right-hand side is the 'value', put between quotes.
-            for i in inputs: 
-                exec(i['id']+'='+ '"'+i['value']+'"')
+            # the right-hand side is the 'value', put between quotes since every input is a string, later interpreted by code_string
+            print('avant inputs','\n\n')
+            for v in inputs: 
+                print('executed statement    :', v['id']+'='+ '"'+v['value']+'"', '\n\n')
+                exec(v['id']+'='+ '"'+v['value']+'"')
+            print('avant codestring','\n\n')
             exec(code_string)
             self.variables = locals()
-            del self.variables['dictionnaire'], self.variables['inputs'], self.variables['declarations'], self.variables['self'], self.variables['code_string']
+
+            del self.variables['dictionnaire'], self.variables['inputs'], self.variables['declarations'], \
+            self.variables['self'], self.variables['code_string']
+            if 'v' in self.variables : del self.variables['v']
             
-            print(inputs)
-    code = Code(dictionnaire, inputs)
+    code = Code(dictionnaire, inputs, declarations)
     return code.variables
 
 # Create your models here.
@@ -110,30 +118,20 @@ class Exo(models.Model):
         # On ajoute comme variable le dictionnaire 'ok_answer', qui peut ête renseigné dans le corrigé
         dic['ok_answer'] = {}
         # on ajoute/modifie des données au dictionnaire par l'exécution de 'après'
-        # print('DICTIONNAIRE\n\n', dictionnaire, '\n\n')
+        print('avant exec apres','\n\n')
         if 'dec' in inputs : dic = execution(self.apres, dic, inputs_list, inputs['dec'])
         else : dic = execution(self.apres, dic, inputs_list)
+        print('après exec apres','\n\n')
+
         ok_answer = dic['ok_answer']
-        print(ok_answer)
-        
-        #for input in status['inputs'] :
+
         for type in inputs :
             for input in inputs[type] :
                 if (input['id'] in ok_answer) and (ok_answer[input['id']] == True) :
                     input['style'] = "good_answer"
-                # except for geogebra objects, not good means wrong
-                else : 
+                elif (input['id'] in ok_answer) and (ok_answer[input['id']] == False) :
                     input['style'] = "wrong_answer"
-        # addition for geogebra layout
-        if 'ggb' in inputs:
-            for input in inputs['ggb'] :
-                    if (input['id'] in ok_answer) and (ok_answer[input['id']] == True) :
-                        input['style'] = "good_answer"
-                    elif (input['id'] in ok_answer) and (ok_answer[input['id']] == False) :
-                        input['style'] = "wrong_answer"
-                    # for geogebra objects, not good means nothing (otherwise most would be wrong)
-                    else: input['style'] = "other"
-        print(inputs)        
+                else: input['style'] = "other"
         result = {}
         result['feedback'] = Template(self.reponse).render(Context(for_template(dic)))
         result['inputs'] = inputs

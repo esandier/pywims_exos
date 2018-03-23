@@ -44,6 +44,7 @@ div.item-liste{
 	display:flex;
 	margin-top: 10px;
 }
+
 div.item-liste h1, input.item-liste {
 	font-size: 18pt;
 	color: SteelBlue;
@@ -185,6 +186,19 @@ button.dev-titre, span.dev-titre { /* titre de l'exo */
 	width: auto;
 	z-index:10;
 	}
+
+.input_matrix {
+	border : none;
+	border-radius:4px;
+	margin: 2px;
+	text-align: center;
+	font-style: italic;
+	font-size: 12pt;
+	color:black;
+	background-color: LightGrey;
+	width: auto;
+	z-index:10;
+	}
 	
 .absolute{
   position: absolute;
@@ -285,3 +299,31 @@ div.dev-titre { /* titre de l'exo */
   padding:2px 8px 2px 8px;
   color:black;
 }
+
+/* style de table pour les matrices. Ca ajoute les parenthèses */
+
+.matrix {
+    position: relative;
+    margin: 10px;
+    display: inline-table;
+    vertical-align: middle;
+}
+.matrix:before, .matrix:after {
+    content: "";
+    position: absolute;
+    top: 0;
+    border: 2px solid #000;
+    width: 6px;
+    height: 100%;
+}
+.matrix:before {
+    left: -6px;
+    border-right: 0;
+}
+.matrix:after {
+    right: -6px;
+    border-left: 0;
+}
+
+
+

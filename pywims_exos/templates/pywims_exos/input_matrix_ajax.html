@@ -1,13 +1,15 @@
+{% load json_filter %}
 <!-- hidden input declares the matrix so it can be later populated -->
-<input type = 'hidden' id = 'form_dec_{{ name }}' value = '[[0 for x in {{ rangelines }}] for y in {{ rangecols }}]'/>
-<table>
-{% for i in rangelines %}
+<input type = 'hidden' id = 'form_dec_{{ name }}' value = '{{ matrix|tojson }}'/> 
+<table class="matrix">
+{% for line in matrix %}
 <tr>
-    {% for j in rangecols %}
+    {% for element in line %}
     <td>
-        <input class='input absolute' id ='form_txt_{{ name }}[{{i}}][{{j}}]' style='{{ style_cell }}'/>
+        <input class='input_matrix absolute' id ='form_txt_{{ name }}[{{forloop.parentloop.counter0}}][{{forloop.counter0}}]' 
+        value = '{{ element|default_if_none:"" }}' style='{{ style_cell }}'/>
         <!-- Phantom prevents animations from disrupting page layout -->
-        <input class='input phantom' id ='phantom_txt_{{ name }}[{{i}}][{{j}}]' style='{{ style_cell }}' disabled = 'disabled'/>
+        <input class='input_matrix phantom' id ='phantom_txt_{{ name }}[{{forloop.parentloop.counter0}}][{{forloop.counter0}}]' style='{{ style_cell }}' disabled = 'disabled'/>
     </td>
     {% endfor %}
 </tr>

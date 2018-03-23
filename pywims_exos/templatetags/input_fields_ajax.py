@@ -44,14 +44,38 @@ def input_drop(name, display, **kwargs):
     return {'name': name, 'display': display, 'style_boite': style_boite_string,
     'style_contenu': style_contenu_string}
 
-@register.inclusion_tag('pywims_exos/input_matrix_ajax.html')
-def input_matrix(name, lines, colonnes, **kwargs):
+@register.inclusion_tag('pywims_exos/input_matrix_ajax.html', takes_context=True)
+def input_matrix(context, name, **kwargs):
+    # first way of calling, by specifying a size. Creates a square matrix of blank input fields
+    if 'size' in kwargs:
+        range_lines = range(kwargs['size'])
+        range_cols = range_lines
+        matrix = []
+        for i in range_lines:
+            matrix.append([])
+            for j in range_cols: matrix[i].append('')
+    # second method for calling, by specifying numlines and numcols. 
+    # Creates a rectangular matrix of blank input fields
+    if 'lines' in kwargs and  'cols' in kwargs:
+        range_lines = range(kwargs['lines'])
+        range_cols = range(kwargs['cols'])
+        matrix = []
+        for i in range_lines:
+            matrix.append([])
+            for j in range_cols: matrix[i].append('')
+    # third method for calling, by specifying an array.
+    # Creates a array of the same size of input fields initialized with the array
+    if 'matrix' in kwargs:
+        matrix = kwargs['matrix']
+        range_lines = range(len(matrix))
+        range_cols = range(len(matrix[0]))
+
     if 'style_cell' in kwargs:
-        style_cell_string = kwargs['style_cell']
-    else: style_cell_string = ''
+        style_cell = kwargs['style_cell']
+    else: style_cell = ''
     
     # lines and cols are put in a range because django templates dont do numeric loops
-    return {'name': name, 'rangelines': range(lines), 'rangecols': range(colonnes), 'style_cell': style_cell_string}
+    return {'name': name, 'matrix': matrix, 'range_lines': range_lines,'range_cols':range_cols, 'style_cell': style_cell}
 
 @register.inclusion_tag('pywims_exos/input_ggb_ajax.html')
 def input_ggb(name):
