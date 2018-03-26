@@ -5,7 +5,7 @@ def py_wims(a):
     with evaluate(False) :
         try: a = sympify(a)
         except (SympifyError, NameError, SyntaxError, IndexError):
-            return False
+            return None
         return a
 
 def is_nombre(a):
@@ -20,9 +20,10 @@ def is_fraction(a):
     return (is_nombre(f[0]) and  is_nombre(f[1]))
 
 def is_equal(a, b):
-# teste l'égalité de deux expressions sympy, après simplification. Utilisation typique: is_equal(py_wims(truc), py_wims(bidule)), donc l'argument est 'false' si la conversion
+# teste l'égalité de deux expressions sympy, après simplification. Utilisation typique: 
+# is_equal(py_wims(truc), py_wims(bidule)), donc l'argument est 'None' si la conversion
 # a échoué.
-    if (a == False) or (b == False) : return False # il y a eu echec de conversion sur a ou b
+    if (a == None) or (b == None) : return None # il y a eu echec de conversion sur a ou b
     else : return  simplify(a-b) == 0
 
 
