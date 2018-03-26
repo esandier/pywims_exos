@@ -46,6 +46,16 @@ $( document ).ready(function(){
   }
 
   $( "#submit_button" ).click(function() {
+    // execute all functions whose name begins with 'on_submit'
+    for (var string in window) {
+    // check if the property/key is defined in the object itself, not in parent
+        if (window.hasOwnProperty(string)) {
+            if (string.slice(0,9) == 'on_submit') {
+                window[string]();
+            }
+        }
+    }
+      
     var inputs = getInputs();
 
     var status = {requested_action: 'submit', inputs: inputs, pk: {{ pk|tojson }} };
@@ -147,12 +157,13 @@ $( document ).ready(function(){
 <script type="text/javascript">
     // parameters of the geogebra app
 	var parameters = {
+	    "appname":"classic",
 		"prerelease":false,
 		"width":500,
 		"height":300,
 		"showToolBar":false,
 		"borderColor":"#FFFFFF",
-		"showMenuBar":false,
+		"showMenuBar":true,
 		"showAlgebraInput":false,
  		"showResetIcon":false,
 //		"enableLabelDrags":false,
@@ -161,9 +172,8 @@ $( document ).ready(function(){
 		"capturingThreshold":null,
 		"showToolBarHelp":false,
  		"errorDialogsActive":true,
-//		"useBrowserForJS":true,
+		"useBrowserForJS":true,
         "langage":"en",
-        "enable3D":true,
  		"filename":"{{ ggb_file.url }}"
 	};
 

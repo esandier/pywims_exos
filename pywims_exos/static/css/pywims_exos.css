@@ -6,6 +6,11 @@
     -moz-box-sizing: border-box;
 }
 
+::-webkit-resizer: {
+    cursor:se-resize;
+      border: 2px solid black;
+ }
+
 body {
   font-family: 'Crete Round', serif;
 }
@@ -190,19 +195,20 @@ button.dev-titre, span.dev-titre { /* titre de l'exo */
 .input_matrix {
 	border : none;
 	border-radius:4px;
-	margin: 2px;
 	text-align: center;
 	font-style: italic;
 	font-size: 12pt;
 	color:black;
 	background-color: LightGrey;
-	width: auto;
 	z-index:10;
-	}
-	
-.absolute{
-  position: absolute;
-  }
+}
+
+.absolute_center{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
   
 .phantom {
   opacity : 0;

@@ -1,15 +1,29 @@
 {% load json_filter %}
 <!-- hidden input declares the matrix so it can be later populated -->
-<input type = 'hidden' id = 'form_dec_{{ name }}' value = '{{ matrix|tojson }}'/> 
-<table class="matrix">
+<style>
+.cell {
+  height: {{ cell_height }};
+  width: {{ cell_width }};
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  align-items:center;
+  position:relative;
+}
+</style>
+
+<input type = 'hidden' id = 'form_dec_{{ name }}' value = '{{ matrix|tojson }}'/>
+<table class="matrix" id = 'form_xxx_{{ name }}'>
 {% for line in matrix %}
 <tr>
     {% for element in line %}
     <td>
-        <input class='input_matrix absolute' id ='form_txt_{{ name }}[{{forloop.parentloop.counter0}}][{{forloop.counter0}}]' 
-        value = '{{ element|default_if_none:"" }}' style='{{ style_cell }}'/>
+        <div class='cell'>
+        <input class='input_matrix absolute_center'  id ='form_txt_{{ name }}[{{forloop.parentloop.counter0}}][{{forloop.counter0}}]' 
+        value = '{{ element|default_if_none:"" }}' style='{{ cell_style }}'/>
         <!-- Phantom prevents animations from disrupting page layout -->
-        <input class='input_matrix phantom' id ='phantom_txt_{{ name }}[{{forloop.parentloop.counter0}}][{{forloop.counter0}}]' style='{{ style_cell }}' disabled = 'disabled'/>
+        <input class='input_matrix absolute_center phantom'  id ='phantom_txt_{{ name }}[{{forloop.parentloop.counter0}}][{{forloop.counter0}}]' style='{{ cell_style }}' disabled = 'disabled'/>
+        </div>
     </td>
     {% endfor %}
 </tr>

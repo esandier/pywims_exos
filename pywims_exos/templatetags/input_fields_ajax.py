@@ -48,34 +48,68 @@ def input_drop(name, display, **kwargs):
 def input_matrix(context, name, **kwargs):
     # first way of calling, by specifying a size. Creates a square matrix of blank input fields
     if 'size' in kwargs:
-        range_lines = range(kwargs['size'])
-        range_cols = range_lines
+        size = kwargs['size']
         matrix = []
-        for i in range_lines:
+        for i in range(size):
             matrix.append([])
-            for j in range_cols: matrix[i].append('')
-    # second method for calling, by specifying numlines and numcols. 
+            for j in range(size): matrix[i].append('')
+    # second method for calling, by specifying numrows and numcols. 
     # Creates a rectangular matrix of blank input fields
-    if 'lines' in kwargs and  'cols' in kwargs:
-        range_lines = range(kwargs['lines'])
-        range_cols = range(kwargs['cols'])
+    if 'rows' in kwargs and  'cols' in kwargs:
         matrix = []
-        for i in range_lines:
+        for i in range(rows):
             matrix.append([])
-            for j in range_cols: matrix[i].append('')
+            for j in range(cols): matrix[i].append('')
     # third method for calling, by specifying an array.
     # Creates a array of the same size of input fields initialized with the array
     if 'matrix' in kwargs:
         matrix = kwargs['matrix']
-        range_lines = range(len(matrix))
-        range_cols = range(len(matrix[0]))
 
-    if 'style_cell' in kwargs:
-        style_cell = kwargs['style_cell']
-    else: style_cell = ''
+    if 'cell_width' in kwargs:
+        cell_width = kwargs['cell_width']
+    else: cell_width = '2em'
     
-    # lines and cols are put in a range because django templates dont do numeric loops
-    return {'name': name, 'matrix': matrix, 'range_lines': range_lines,'range_cols':range_cols, 'style_cell': style_cell}
+    if 'cell_height' in kwargs:
+        cell_height = kwargs['cell_height']
+    else: cell_height = '2em'
+    
+    if 'cell_style' in kwargs:
+        cell_style = kwargs['cell_style']
+    else: cell_style = ''
+    
+    return {'name': name, 'matrix': matrix, 'cell_style': cell_style, 'cell_width': cell_width, 'cell_height': cell_height}
+
+# A matrix of input fields which can be user resized
+@register.inclusion_tag('pywims_exos/input_vmatrix_ajax.html', takes_context=True)
+def input_vmatrix(context, name, **kwargs):
+
+    if 'cell_style' in kwargs:
+        cell_style = kwargs['cell_style']
+    else: cell_style = ''
+
+    if 'cell_width' in kwargs:
+        cell_width = kwargs['cell_width']
+    else: cell_width = '2em'
+    
+    if 'cell_height' in kwargs:
+        cell_height = kwargs['cell_height']
+    else: cell_height = '2em'
+     
+    if 'max_rows' in kwargs: 
+        max_rows = kwargs['max_rows']
+    else: max_rows = 10
+        
+    if 'max_cols' in kwargs: 
+        max_cols = kwargs['max_cols']
+    else: max_cols = 10
+    
+    matrix = []
+    for i in range(max_rows):
+        matrix.append([])
+        for j in range(max_cols): matrix[i].append('')
+
+    return {'name': name, 'matrix':matrix, 'max_rows': max_rows, 'max_cols': max_cols, 'cell_style': cell_style, 'cell_width': cell_width, 'cell_height': cell_height}
+
 
 @register.inclusion_tag('pywims_exos/input_ggb_ajax.html')
 def input_ggb(name):

@@ -19,21 +19,16 @@ def execution(code_string, dictionnaire, inputs=[], declarations = []):
         def __init__(self, dictionnaire, inputs, declarations):
             # for declarations, 'value' must be executed as a python statement
             # not put between quotes.
-            print('avant declarations','\n\n')
 
             for v in declarations:
                 exec(v['id']+'='+v['value'])
             # dictionnaire is made available as python variables
-            print('avant dictionnaire','\n\n')
             for v in dictionnaire : 
                 exec(v+'=dictionnaire["'+v+'"]')
             # for inputs, the 'id' is executed as a python statement, useful for assignements like 'a[1] = something'
             # the right-hand side is the 'value', put between quotes since every input is a string, later interpreted by code_string
-            print('avant inputs','\n\n')
             for v in inputs: 
-                print('executed statement    :', v['id']+'='+ '"'+v['value']+'"', '\n\n')
                 exec(v['id']+'='+ '"'+v['value']+'"')
-            print('avant codestring','\n\n')
             exec(code_string)
             self.variables = locals()
 
@@ -113,15 +108,15 @@ class Exo(models.Model):
         for type in inputs :
             # le type 'dec' correspond à une déclaration de variable, la 'value' 
             # doit être interprétée comme une déclaration python, pas comme une string à mettre entre quotes
-            if type != 'dec':
+            # type 'xxx'corresponds not to user input, but only elements which will be painted anyway, much like geogebra
+            # geometrical elements. 
+            if type != 'dec' and type != 'xxx':
                 for input in inputs[type] : inputs_list.append(input)
         # On ajoute comme variable le dictionnaire 'ok_answer', qui peut ête renseigné dans le corrigé
         dic['ok_answer'] = {}
         # on ajoute/modifie des données au dictionnaire par l'exécution de 'après'
-        print('avant exec apres','\n\n')
         if 'dec' in inputs : dic = execution(self.apres, dic, inputs_list, inputs['dec'])
         else : dic = execution(self.apres, dic, inputs_list)
-        print('après exec apres','\n\n')
 
         ok_answer = dic['ok_answer']
 

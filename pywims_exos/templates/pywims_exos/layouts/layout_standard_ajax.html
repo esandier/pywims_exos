@@ -47,6 +47,15 @@ $( document ).ready(function(){
   }
 
   $( "#submit_button" ).click(function() {
+    // execute all functions whose name begins with 'on_submit'
+    for (var string in window) {
+    // check if the property/key is defined in the object itself, not in parent
+        if (window.hasOwnProperty(string)) {
+            if (string.slice(0,9) == 'on_submit') {
+                window[string]();
+            }
+        }
+    }
     var inputs = getInputs();
 
     var status = {requested_action: 'submit', inputs: inputs, pk: {{ pk|tojson }} };
@@ -85,13 +94,18 @@ $( document ).ready(function(){
   }( jQuery ));
 
   function paint(inputs) {
+    if (inputs['xxx'] != undefined)
+    for(var i = 0; i < inputs['xxx'].length; i++){
+      var input = inputs['xxx'][i];
+      // this syntax allows for brackets in the element id, useful for arrays
+      $(document.getElementById("form_xxx_"+input.id )).styling('xxx', input.style);
+    }
     if (inputs['txt'] != undefined)
     for(var i = 0; i < inputs['txt'].length; i++){
       var input = inputs['txt'][i];
       // this syntax allows for brackets in the element id, useful for arrays
       $(document.getElementById("form_txt_"+input.id )).styling('txt', input.style);
     }
-    
     if (inputs['sel'] != undefined)
     for(var i = 0; i < inputs['sel'].length; i++){
       var input = inputs['sel'][i];
