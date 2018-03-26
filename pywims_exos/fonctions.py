@@ -1,4 +1,4 @@
-from sympy import *
+﻿from sympy import *
 
 def py_wims(a):
 # transforme une string en expression sympy, sans la simplifier, renvoie False si echec de conversion.

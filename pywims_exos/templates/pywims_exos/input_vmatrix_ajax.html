@@ -18,6 +18,9 @@
   height:calc(2*{{ cell_height }});
   min-width:{{ cell_width }};
   min-height:{{ cell_height }};
+  max-width: calc({{ max_cols }}*{{ cell_width }});
+  max-height:calc({{ max_rows }}*{{ cell_height }});
+
   resize:both;
   justify-content: flex-start;
   align-items:center;
@@ -45,6 +48,7 @@
 .papa {
   width: inherit;
   height: {{ cell_height }};
+  margin:0;
   display: flex;
   flex-flow: row wrap;
   overflow: hidden;
@@ -54,10 +58,7 @@
 .cell {
   height: {{ cell_height }};
   width: {{ cell_width }};
-  display: flex;
-  flex-flow: row wrap;
-  justify-content: center;
-  align-items:center;
+  margin:0;
   position:relative;
 }
 </style>
