@@ -77,12 +77,20 @@ def input_matrix(context, name, **kwargs):
         cell_style = kwargs['cell_style']
     else: cell_style = ''
     
-    return {'name': name, 'matrix': matrix, 'cell_style': cell_style, 'cell_width': cell_width, 'cell_height': cell_height}
+    if 'input_style' in kwargs:
+        input_style = kwargs['input_style']
+    else: input_style = ''
+    
+    return {'name': name, 'matrix': matrix, 'cell_style': cell_style, 'input_style': input_style, 'cell_width': cell_width, 'cell_height': cell_height}
 
 # A matrix of input fields which can be user resized
 @register.inclusion_tag('pywims_exos/input_vmatrix_ajax.html', takes_context=True)
 def input_vmatrix(context, name, **kwargs):
 
+    if 'input_style' in kwargs:
+        input_style = kwargs['input_style']
+    else: input_style = ''
+    
     if 'cell_style' in kwargs:
         cell_style = kwargs['cell_style']
     else: cell_style = ''
@@ -108,7 +116,7 @@ def input_vmatrix(context, name, **kwargs):
         matrix.append([])
         for j in range(max_cols): matrix[i].append('')
 
-    return {'name': name, 'matrix':matrix, 'max_rows': max_rows, 'max_cols': max_cols, 'cell_style': cell_style, 'cell_width': cell_width, 'cell_height': cell_height}
+    return {'name': name, 'matrix':matrix, 'max_rows': max_rows, 'max_cols': max_cols, 'input_style': input_style, 'cell_style': cell_style, 'cell_width': cell_width, 'cell_height': cell_height}
 
 
 @register.inclusion_tag('pywims_exos/input_ggb_ajax.html')

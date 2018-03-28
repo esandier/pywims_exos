@@ -13,16 +13,18 @@
 </style>
 
 <input type = 'hidden' id = 'form_dec_{{ name }}' value = '{{ matrix|tojson }}'/>
-<table class="matrix" id = 'form_xxx_{{ name }}'>
+<table class="matrix">
 {% for line in matrix %}
 <tr>
     {% for element in line %}
     <td>
-        <div class='cell'>
+        <div class='cell' style='{{ cell_style }}'>
         <input class='input_matrix absolute_center'  id ='form_txt_{{ name }}[{{forloop.parentloop.counter0}}][{{forloop.counter0}}]' 
-        value = '{{ element|default_if_none:"" }}' style='{{ cell_style }}'/>
+        value = '{{ element|default_if_none:"" }}' style='{{ input_style }}'/>
         <!-- Phantom prevents animations from disrupting page layout -->
-        <input class='input_matrix absolute_center phantom'  id ='phantom_txt_{{ name }}[{{forloop.parentloop.counter0}}][{{forloop.counter0}}]' style='{{ cell_style }}' disabled = 'disabled'/>
+        <input class='input_matrix absolute_center phantom'  
+            id ='phantom_txt_{{ name }}[{{forloop.parentloop.counter0}}][{{forloop.counter0}}]' 
+            style='{{ input_style }}' disabled = 'disabled'/>
         </div>
     </td>
     {% endfor %}

@@ -109,7 +109,7 @@ class Exo(models.Model):
             # le type 'dec' correspond à une déclaration de variable, la 'value' 
             # doit être interprétée comme une déclaration python, pas comme une string à mettre entre quotes
             # type 'xxx'corresponds not to user input, but only elements which will be painted anyway, much like geogebra
-            # geometrical elements. 
+            # geometrical elements. TODO TODO TODO
             if type != 'dec' and type != 'xxx':
                 for input in inputs[type] : inputs_list.append(input)
         # On ajoute comme variable le dictionnaire 'ok_answer', qui peut ête renseigné dans le corrigé
