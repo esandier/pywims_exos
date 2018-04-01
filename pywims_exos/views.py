@@ -37,7 +37,7 @@ def run_exo_ajax(request, pk):
 		# result['dic'] is the python dictionary resulting from the execution of 'avant'
 		# canceled in favor of saving random state 
 		#request.session['current_exo_dict'] = result['dic']
-		request.session['seed'] = result['dic']['seed']
+		request.session['seed'] = result['seed']
 		# result['context'] is a formatted version of result['dic'] suitable for use in a template
 		contexte = result['context']
 		contexte['current_exo_dict'] = result['dic']
@@ -54,16 +54,17 @@ def run_exo_ajax(request, pk):
 	if request.method == 'POST':
 		#print('POST')
 		status = json.loads(request.body.decode())
-		#print('STATUS\n\n',status,'\n\n')
+		print('STATUS\n\n',status,'\n\n')
 
 		if status['requested_action'] == 'submit' :
 			exo = get_object_or_404(Exo, pk=status['pk'])
 			# Les données récupérées après l'exécution de 'avant'. Il faut les récupérer dans un contexte
 			# evaluate(False), sinon les expressions sympy peuvent être évaluées, et on ne retrouve pas l'original.
-			with evaluate(False):
+			#with evaluate(False):
 				# canceled in favor of restoring random state from seed. 
 				#dictionnaire = request.session['current_exo_dict']
-				dictionnaire = exo.exec_avant({},seed = request.session['seed'])['dic']
+			dictionnaire = exo.exec_avant({},seed = request.session['seed'])['dic']
+
 			# add user-input to the dictionary
 			# print('FORM DATA\n\n', status['inputs'], '\n\n')
 			#for input in status['inputs'] :
@@ -72,7 +73,7 @@ def run_exo_ajax(request, pk):
 			# on ajoute/modifie des données au dictionnaire par l'exécution de 'après'
 			# print('DICTIONNAIRE\n\n', dictionnaire, '\n\n')
 			result = exo.exec_apres(dictionnaire, status['inputs'])
-            
+
 			# print('RETURNED STATUS\n\n',status,'\n\n')
 			return HttpResponse(json.dumps(result), content_type='application/json')
 

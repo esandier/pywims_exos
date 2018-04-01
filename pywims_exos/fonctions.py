@@ -1,4 +1,5 @@
 ﻿from sympy import *
+import sympy
 from django.template import Template, Context
 
 
@@ -42,10 +43,7 @@ def is_equal(a, b):
 
 def for_template(arg):
 # returns arg in a format suitable for use in an html template with mathjax. applies recursively to list items if arg is a list
-    x = symbols('x')
-    graphe = plot(x, show=False)
-    
-    if type(arg) == type(graphe): # Case of a plot. An html  image tag is returned.
+    if type(arg) == type(plot(symbols('x'), show=False)): # Case of a plot. An html  image tag is returned.
         figfile = BytesIO()
         arg.save(figfile)
         figfile.seek(0)  # rewind to beginning of file
@@ -54,7 +52,7 @@ def for_template(arg):
     
         return  Template('<img src="data:image/png;base64,{{ plot_data }}" style="pointer-events:none">').\
         render(Context({'plot_data': figdata_png}))
-    elif isinstance(arg, tuple(core.all_classes)): # tests for a sympy expression
+    elif isinstance(arg, Expr): # tests for a sympy expression
         return  r'\displaystyle '+latex(arg, mat_delim="[") # delault latex output doesn't include $, but enforces 'displaystyle'.
     elif type(arg) in [int, float, str] :
         return arg

@@ -10,44 +10,49 @@ from .fonctions import *
 #from django.core.files import File
 
 
-def execution(code_string, dictionnaire, inputs=[], declarations = [], **kwargs):
-# executes  python code "code_string", after assigning variables in  'dictionnaire', a dictionary, 
-# and in 'inputs', which is a list of pairs {'id': id, 'value':value}. This allows more flexibility in variable assignments, for instance
-# {'id':'a[1]', 'value':37}
-# puis renvoie un dictionnaire de toutes les variables locales (définies dans 'dictionnaire' et définies par 'code_string')
+def execution(code_string="", dictionnaire={}, inputs=[], declarations = [], **kwargs):
+# executes  python code "code_string", after assigning variables.
+# 1) dictionnaire is a dictionary. The key is the variable name, the value is the variable value.
+# 2) inputs is a list of pairs {'id': id, 'value':value}. This allows more flexibility for variable names, 
+# for instance {'id':'a[1]', 'value':37}. during assignment, value is between quotes
+# 3) declarations is similar, but 'value' is not between quotes during assignment, hence may be a python instruction
+# Returns all assigned variables, and the seed of the random generator that allows to re-run the function with the same result
+
     class Code:
         def __init__(self, dictionnaire, inputs, declarations, **kwargs):
-
-            if 'seed' in kwargs:
-                setstate(kwargs['seed'])
+            # it is important to have evaluate(False), so that if '10/2' is not evaluated to '5', for instance
+            with evaluate(False):
+                for v in declarations:
+                    exec(v['id']+'='+v['value'])
+                for v in dictionnaire : 
+                    exec(v+'=dictionnaire["'+v+'"]')
+                # for inputs, the 'id' is executed as a python statement, useful for assignements like 'a[1] = something'
+                # the right-hand side is the 'value', put between quotes since every input is a string, later interpreted by code_string
+                for v in inputs: 
+                    exec(v['id']+'='+ '"'+v['value']+'"')
                 
-            # save random state
-            seed = getstate()
+                if 'seed' in kwargs:
+                    current_seed = kwargs['seed']
+                else:
+                    current_seed=randint(1,1000000000000)
+                
+                seed(current_seed)
 
-            # for declarations, 'value' must be executed as a python statement
-            # not put between quotes.
-            for v in declarations:
-                exec(v['id']+'='+v['value'])
-            # dictionnaire is made available as python variables
-            for v in dictionnaire : 
-                exec(v+'=dictionnaire["'+v+'"]')
-            # for inputs, the 'id' is executed as a python statement, useful for assignements like 'a[1] = something'
-            # the right-hand side is the 'value', put between quotes since every input is a string, later interpreted by code_string
-            for v in inputs: 
-                exec(v['id']+'='+ '"'+v['value']+'"')
-            exec(code_string)
-            self.variables = locals()
+                exec(code_string)
 
-            del self.variables['dictionnaire'], self.variables['inputs'], self.variables['declarations'], \
-            self.variables['self'], self.variables['code_string'], self.variables['kwargs']
-            if 'v' in self.variables : del self.variables['v']
-            
+                self.variables = locals()
+                self.seed = current_seed
+
+                del self.variables['dictionnaire'], self.variables['inputs'], self.variables['declarations'], \
+                self.variables['self'], self.variables['code_string'], self.variables['kwargs'], self.variables['current_seed']
+                if 'v' in self.variables : del self.variables['v']
+
     if 'seed' in kwargs:
         code = Code(dictionnaire, inputs, declarations, seed=kwargs['seed'])
     else:
         code = Code(dictionnaire, inputs, declarations)
         
-    return code.variables
+    return {'variables':code.variables, 'seed':code.seed}
 
 # Create your models here.
 
@@ -98,14 +103,16 @@ class Exo(models.Model):
         return settings.LAYOUTS_DIRECTORY+'/'+self.layouts_corrige[self.layout]
 
     def exec_avant(self, dictionnaire, **kwargs):
-        result = {}
-        # dictionary of variabes set by 'avant' code
         if 'seed' in kwargs:
-            result['dic'] = execution(self.avant, dictionnaire, seed=kwargs['seed'])
+            resultat = execution(self.avant, dictionnaire, seed=kwargs['seed'])
         else: 
-            result['dic'] = execution(self.avant, dictionnaire)
-        # the template context gets a formatted version ...
-        result['context'] = for_template(result['dic'])
+            resultat = execution(self.avant, dictionnaire)
+
+        # the template context gets a formatted version of the variables
+        result = {}
+        result['context'] = for_template(resultat['variables'])
+        result['dic'] = resultat['variables']
+        result['seed'] = resultat['seed']
 
         # addition for geogebra layout: ... and some geogebra data, if present
         if self.layout == 'GGB':
@@ -128,8 +135,12 @@ class Exo(models.Model):
         # On ajoute comme variable le dictionnaire 'ok_answer', qui peut ête renseigné dans le corrigé
         dic['ok_answer'] = {}
         # on ajoute/modifie des données au dictionnaire par l'exécution de 'après'
-        if 'dec' in inputs : dic = execution(self.apres, dic, inputs_list, inputs['dec'])
-        else : dic = execution(self.apres, dic, inputs_list)
+        if 'dec' in inputs : 
+            resultat = execution(self.apres, dic, inputs_list, inputs['dec'])
+            dic = resultat['variables']
+        else :
+            resultat = execution(self.apres, dic, inputs_list)
+            dic = resultat['variables']
 
         ok_answer = dic['ok_answer']
 
