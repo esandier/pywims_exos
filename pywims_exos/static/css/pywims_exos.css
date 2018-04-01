@@ -248,6 +248,7 @@ div.source  {
 	align-items: center;
 	text-align:center;
 	font-size: 1em;
+	overflow:hidden;
 }
 
 /* Menu développement bootstrap */

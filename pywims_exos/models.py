@@ -10,16 +10,22 @@ from .fonctions import *
 #from django.core.files import File
 
 
-def execution(code_string, dictionnaire, inputs=[], declarations = []):
+def execution(code_string, dictionnaire, inputs=[], declarations = [], **kwargs):
 # executes  python code "code_string", after assigning variables in  'dictionnaire', a dictionary, 
 # and in 'inputs', which is a list of pairs {'id': id, 'value':value}. This allows more flexibility in variable assignments, for instance
 # {'id':'a[1]', 'value':37}
 # puis renvoie un dictionnaire de toutes les variables locales (définies dans 'dictionnaire' et définies par 'code_string')
     class Code:
-        def __init__(self, dictionnaire, inputs, declarations):
+        def __init__(self, dictionnaire, inputs, declarations, **kwargs):
+
+            if 'seed' in kwargs:
+                setstate(kwargs['seed'])
+                
+            # save random state
+            seed = getstate()
+
             # for declarations, 'value' must be executed as a python statement
             # not put between quotes.
-
             for v in declarations:
                 exec(v['id']+'='+v['value'])
             # dictionnaire is made available as python variables
@@ -33,10 +39,14 @@ def execution(code_string, dictionnaire, inputs=[], declarations = []):
             self.variables = locals()
 
             del self.variables['dictionnaire'], self.variables['inputs'], self.variables['declarations'], \
-            self.variables['self'], self.variables['code_string']
+            self.variables['self'], self.variables['code_string'], self.variables['kwargs']
             if 'v' in self.variables : del self.variables['v']
             
-    code = Code(dictionnaire, inputs, declarations)
+    if 'seed' in kwargs:
+        code = Code(dictionnaire, inputs, declarations, seed=kwargs['seed'])
+    else:
+        code = Code(dictionnaire, inputs, declarations)
+        
     return code.variables
 
 # Create your models here.
@@ -87,10 +97,13 @@ class Exo(models.Model):
     def layout_corrige(self): # renvoie le nom du fichier layout_corrige
         return settings.LAYOUTS_DIRECTORY+'/'+self.layouts_corrige[self.layout]
 
-    def exec_avant(self, dictionnaire):
+    def exec_avant(self, dictionnaire, **kwargs):
         result = {}
         # dictionary of variabes set by 'avant' code
-        result['dic'] = execution(self.avant, dictionnaire)
+        if 'seed' in kwargs:
+            result['dic'] = execution(self.avant, dictionnaire, seed=kwargs['seed'])
+        else: 
+            result['dic'] = execution(self.avant, dictionnaire)
         # the template context gets a formatted version ...
         result['context'] = for_template(result['dic'])
 

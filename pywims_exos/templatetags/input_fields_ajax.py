@@ -122,3 +122,21 @@ def input_vmatrix(context, name, **kwargs):
 @register.inclusion_tag('pywims_exos/input_ggb_ajax.html')
 def input_ggb(name):
     return {'name': name}
+
+@register.inclusion_tag('pywims_exos/pw_plot.html')
+def pw_plot(plot_data, **kwargs):
+    return_data = {'plot_data':plot_data}
+    
+    if 'width' in kwargs:
+        return_data['width'] = kwargs['width']
+    else:
+        return_data['width'] = 300
+
+    if 'height' in kwargs:
+        return_data['height'] = kwargs['height']
+
+    return return_data
+    
+    
+    
+    

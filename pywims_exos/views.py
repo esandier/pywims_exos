@@ -35,7 +35,9 @@ def run_exo_ajax(request, pk):
 		# et on le stocke dans request.session
 		result = exo.exec_avant({})
 		# result['dic'] is the python dictionary resulting from the execution of 'avant'
-		request.session['current_exo_dict'] = result['dic']
+		# canceled in favor of saving random state 
+		#request.session['current_exo_dict'] = result['dic']
+		request.session['seed'] = result['dic']['seed']
 		# result['context'] is a formatted version of result['dic'] suitable for use in a template
 		contexte = result['context']
 		contexte['current_exo_dict'] = result['dic']
@@ -47,7 +49,6 @@ def run_exo_ajax(request, pk):
 
 		string = "{% extends '" + exo.layout_enonce() + "' %}\n {% load input_fields_ajax %}\n"\
 		+ '{% block enonce_exo %}\n'+ exo.enonce + '\n{% endblock %}'
-		# return HttpResponse(Template(en_tete_exo + exo.enonce + fin_exo).render(Context(contexte)))
 		return HttpResponse(Template(string).render(Context(contexte)))
 
 	if request.method == 'POST':
@@ -60,7 +61,9 @@ def run_exo_ajax(request, pk):
 			# Les données récupérées après l'exécution de 'avant'. Il faut les récupérer dans un contexte
 			# evaluate(False), sinon les expressions sympy peuvent être évaluées, et on ne retrouve pas l'original.
 			with evaluate(False):
-				dictionnaire = request.session['current_exo_dict']
+				# canceled in favor of restoring random state from seed. 
+				#dictionnaire = request.session['current_exo_dict']
+				dictionnaire = exo.exec_avant({},seed = request.session['seed'])['dic']
 			# add user-input to the dictionary
 			# print('FORM DATA\n\n', status['inputs'], '\n\n')
 			#for input in status['inputs'] :
@@ -72,64 +75,6 @@ def run_exo_ajax(request, pk):
             
 			# print('RETURNED STATUS\n\n',status,'\n\n')
 			return HttpResponse(json.dumps(result), content_type='application/json')
-# OBSOLETE
-def run_exo(request, pk):
-	# pk = primary_key de l'exo dans la base de donnée, on le stocke dans le
-	# dictionnaire request.session
-	exo = get_object_or_404(Exo, pk=pk)
-	# On récupère le dictionnaire des variables de l'exo après execution de 'avant'
-	# et on le stocke dans request.session
-	dictionnaire = exo.exec_avant({})
-	request.session['current_exo_dict'] = dictionnaire
-	# Le dictionnaire envoyé au template doit être modifié:
-	# les expressions sympy sont transformées en Latex par la fonction for_template
-	contexte = for_template(dictionnaire)
-	# on ajoute la primary key de l'exo, utilisée quand on redirige vers la vue 'corrigé'
-	contexte['pk'] = pk
-	# Intégration géogebra.
-	if (exo.layout == 'GGB') :
-		contexte['ggb_commands'] = exo.exec_ggb(dictionnaire)
-		contexte['ggb_file'] = exo.ggb_file
-
-	string = "{% extends '" + exo.layout_enonce() + "' %}\n {% load input_fields %}\n"\
-		+ '{% block enonce_exo %}\n'+ exo.enonce + '\n{% endblock %}'
-	# return HttpResponse(Template(en_tete_exo + exo.enonce + fin_exo).render(Context(contexte)))
-	return HttpResponse(Template(string).render(Context(contexte)))
-# OBSOLETE
-def corrige_exo(request, pk):
-	# Les données récupérées après l'exécution de 'avant'. Il faut les récupérer dans un contexte
-	# evaluate(False), sinon les expressions sympy peuvent être évaluées, et on ne retrouve pas l'original.
-	with evaluate(False):
-		dictionnaire = request.session['current_exo_dict']
-
-	reverse_form = {}
-	form_data = {}
-
-	# on ajoute au dictionnaire les données de formulaire, que l'on conserve séparément
-	# On garde aussi un dictionnaire inversé des données de formulaire, utile pour l'affichage des
-	# champs drag-drop
-
-	for v in request.POST :
-		dictionnaire[v] = request.POST[v]
-		# données de formulaire conservée parce que le code 'après' peut modifier le dictionnaire
-		form_data[v] = request.POST[v]
-		reverse_form[request.POST[v]] = v
-
-	exo = get_object_or_404(Exo, pk=pk)
-	# on ajoute/modifie des données au dictionnaire par l'exécution de 'après'
-	dictionnaire = exo.exec_apres(dictionnaire)
-
-	ok_answers = dictionnaire['ok_answer']
-	contexte = for_template(dictionnaire)
-	contexte['form_data'] = form_data
-	contexte['reverse_form_data'] = reverse_form
-	contexte['answer_data'] = ok_answers
-	contexte['pk'] = pk
-	string = "{% extends '" + exo.layout_corrige() + "' %}\n {% load input_fields_for_corrige %}\n"\
-	+ '{% block enonce_exo %}\n'+ exo.enonce + '\n{% endblock %}'\
-	+ '{% block feedback %}\n' + exo.reponse + '\n{% endblock %}'
-	return HttpResponse(Template(string).render(Context(contexte)))
-
 
 def dev_exo(request, pk):#  affiche la page de développement
 
@@ -153,9 +98,7 @@ def dev_exo(request, pk):#  affiche la page de développement
 			exo = get_object_or_404(Exo, pk=status['exo']['pk'])
 			if (status['exo']['layout'] == "GGB") and (status['requested_action'] == 'update-layout') :
 				f = open(Exo.EXOS_EMPTY_GGB_FILE)
-				print('coucou')
 				exo.ggb_file = File(f)
-				print('au revoir')
 				f.close()
 			exo.assign(status['exo'])
 			exo.save()

@@ -84,11 +84,14 @@ $( document ).ready(function(){
         var object = this;
         if (style === 'wrong_answer') color = "LightPink";
         if (style === 'good_answer') color = "LightGreen";
+        //jQuery.effects.createPlaceholder( this );
         this.animate({width: 'toggle'},function(){
           object.css("background-color", color)
           object.animate({width: 'toggle'});
           if (type != 'drg') object.attr('disabled', 'disabled');
         });
+        //jQuery.effects.removePlaceholder( this );
+
         return this;
       };
   }( jQuery ));

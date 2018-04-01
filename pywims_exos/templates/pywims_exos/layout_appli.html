@@ -3,10 +3,14 @@
 <html>
 <head>
 <title>PyWims</title>
+<!-- Bootstrap -->
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+<!-- Font -->
 <link href="//fonts.googleapis.com/css?family=Crete+Round&ampsubset=latin,latin-ext" rel="stylesheet" type="text/css">
+<!-- CSS -->
 <link rel="stylesheet" href="{% static 'css/pywims_exos.css' %}">
+<!-- Mathjax -->
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
 	tex2jax: {
@@ -22,9 +26,11 @@ MathJax.Hub.Config({
 <script type="text/javascript"
 src="https://cdn.rawgit.com/mathjax/MathJax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
 </script>
-<!--
+<!-- USELESS
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 -->
+
+<!-- DRAG-DROP script MOVE ELSEWHERE (TAG DEFINITION?) -->
 	<script>
 	function allowDrop(ev) {
 	    ev.preventDefault();
@@ -51,26 +57,22 @@ src="https://cdn.rawgit.com/mathjax/MathJax/2.7.1/MathJax.js?config=TeX-AMS-MML_
 		if (target == undefined) input_ajax.value = '';
 	}
 	</script>
-<!--- jquery ui -->
+	
+<!--- jquery / jquery ui -->
   <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-  <style>
-  #resizable { width: 150px; height: 150px; padding: 0.5em; }
-  #resizable h3 { text-align: center; margin: 0; }
-  </style>
   <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
   <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-<!--- fin jquery ui -->
 
 
 </head>
 <body>
-<!--
+<!-- USELESS
 <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 -->
+<!-- Bootstrap -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js"></script>
 
-				
 {% block contenu %}
 {% endblock %}
 
