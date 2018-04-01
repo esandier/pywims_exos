@@ -52,8 +52,8 @@ def for_template(arg):
         figdata_png = base64.b64encode(figfile.getvalue())
         figfile.close()
     
-        context = {'plot_data': figdata_png}
-        return  Template('<img src="data:image/png;base64,{{ plot_data }}" style="pointer-events:none">').render(Context(context))
+        return  Template('<img src="data:image/png;base64,{{ plot_data }}" style="pointer-events:none">').\
+        render(Context({'plot_data': figdata_png}))
     elif isinstance(arg, tuple(core.all_classes)): # tests for a sympy expression
         return  r'\displaystyle '+latex(arg, mat_delim="[") # delault latex output doesn't include $, but enforces 'displaystyle'.
     elif type(arg) in [int, float, str] :
