@@ -42,7 +42,8 @@ def is_equal(a, b):
 
 
 def for_template(arg):
-# returns arg in a format suitable for use in an html template with mathjax. applies recursively to list items if arg is a list
+# returns arg in a format suitable for use in an html template with mathjax. 
+# applies recursively to items if arg is a list, dic, tuple
     if type(arg) == type(plot(symbols('x'), show=False)): # Case of a plot. An html  image tag is returned.
         figfile = BytesIO()
         arg.save(figfile)
@@ -50,13 +51,18 @@ def for_template(arg):
         figdata_png = base64.b64encode(figfile.getvalue())
         figfile.close()
     
-        return  Template('<img src="data:image/png;base64,{{ plot_data }}" style="pointer-events:none">').\
+        return  Template('<img src="data:image/png;base64,{{ plot_data }}" \
+        style="pointer-events:none; width:inherit; height:inherit">').\
         render(Context({'plot_data': figdata_png}))
-    elif isinstance(arg, Expr): # tests for a sympy expression
-        return  r'\displaystyle '+latex(arg, mat_delim="[") # delault latex output doesn't include $, but enforces 'displaystyle'.
+    elif ('sympy' in str(type(type(arg)))) or  ('sympy' in str(type(arg))): 
+        # isinstance(arg, Expr): # tests for a sympy expression, but misses matrices, for instance
+        # selon les cas 'sympy' n'est pas dans type(arg), mais dans type(type(arg)). C'est de la cuisine.
+        # delault latex output doesn't include $, but enforces 'displaystyle'.
+        return  r'\displaystyle '+latex(arg, mat_delim="[") 
     elif type(arg) in [int, float, str] :
         return arg
     elif isinstance(arg, dict):
+        #print('dict :', arg, '\n\n')
         return {k: for_template(arg[k]) for k in arg}
     elif isinstance(arg, list):
         return list(map(for_template,arg))
