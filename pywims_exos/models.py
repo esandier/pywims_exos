@@ -21,7 +21,7 @@ def execution(code_string="", dictionnaire={}, inputs=[], declarations = [], **k
     class Code:
         def __init__(self, dictionnaire, inputs, declarations, **kwargs):
             # it is important to have evaluate(False), so that if '10/2' is not evaluated to '5', for instance
-            with evaluate(False):
+            #with evaluate(False):
                 for v in declarations:
                     exec(v['id']+'='+v['value'])
                 for v in dictionnaire : 
@@ -122,6 +122,8 @@ class Exo(models.Model):
         return result
 
     def exec_apres(self, dic, inputs):
+        print('inputs:\n', inputs)
+        print('dic:\n', dic)
         # flattens inputs into a single list of pairs {'id:id,'value':value'} not grouped by type
         # this is what is expected by 'execution'
         inputs_list = []

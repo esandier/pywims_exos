@@ -50,7 +50,8 @@ def for_template(arg):
         figfile.seek(0)  # rewind to beginning of file
         figdata_png = base64.b64encode(figfile.getvalue())
         figfile.close()
-    
+        arg._backend.close()
+
         return  Template('<img src="data:image/png;base64,{{ plot_data }}" \
         style="pointer-events:none; width:inherit; height:inherit">').\
         render(Context({'plot_data': figdata_png}))
