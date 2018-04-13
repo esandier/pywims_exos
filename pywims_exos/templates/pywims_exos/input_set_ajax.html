@@ -1,0 +1,159 @@
+{% load json_filter %}
+{% load static %}
+
+<!-- hidden input declares the set so it can be later populated -->
+<input type = 'hidden' id = 'form_dec_{{ name }}' value = '{{ set|tojson }}'/>
+
+<style>
+    .{{ name }}_mamie{
+        display:inline-block;
+        position: relative;
+        margin: 5px;
+        vertical-align:-20%;
+    }
+    .{{ name }}_mamie:before, .{{ name }}_mamie:after {
+        content: "";
+        position: absolute;
+        bottom: calc(0.15*{{ cell_height }});
+        height: 100%;
+        font-family: Georgia, serif;
+        font-size: {{ cell_height }}
+    }
+    .{{ name }}_mamie:before {
+        left: -6px;
+        content: "{";
+    }
+    .{{ name }}_mamie:after {
+        right: -6px;
+        content:"}";
+    }
+    
+    .{{ name }}_papa {
+      width: calc(2*{{ cell_width }});
+      height: {{ cell_height }};
+      margin:0;
+      display: inline-flex;
+      flex-flow: row wrap;
+      overflow: hidden;
+    }
+    .{{ name }}_cell {
+        height: {{ cell_height }};
+        width: {{ cell_width }};
+        margin:0;
+        position:relative;
+    }
+    .{{ name }}_cell:before{
+        content: ",";
+        position: absolute;
+        left: -6px;
+        bottom: calc(0.15*{{ cell_height }});
+        height: 100%;
+        font-size: {{ cell_height }}
+    }
+    .ui-resizable-e {
+        right:-24px;
+        top:24px;
+    }
+</style>
+
+<div class ='{{ name }}_mamie'>
+    <!-- The Handle to resize the matrix -->
+    <img         
+        id='resize-{{ name }}'
+        class="ui-resizable-handle ui-resizable-e"
+        src="{% static 'ui/grab_icon.png' %}" style="width:20px;height:20px;"
+    >
+    <!-- End of Handle -->
+
+    <div class ='{{ name }}_papa' id='{{ name }}_div'>
+        <div id='{{ name }}_emptyset' class='{{ name }}_cell' style='{{ cell_style }}'>
+        <input 
+            class='input_matrix absolute_center' 
+            style=' 
+                font-size: calc(0.8*{{ cell_height }});
+                font-style: normal;
+                {{ input_style }};
+                background-color:inherit;'
+            tabindex="-1"
+            value="&#8709;"
+        />
+        </div> 
+
+        {% for element in set %}
+        <div class='{{ name }}_cell' style='{{ cell_style }}'>
+            <!-- tabindex makes element inaccessible by tabs, important otherwise hidden cells may become visible -->
+            <input 
+                class='input_matrix absolute_center' 
+                id ='form_txt_{{ name }}[{{forloop.counter0}}]' 
+                style='{{ input_style }}'
+                value = '{{ element|default_if_none:"" }}'
+                tabindex="-1"
+            />
+            <!-- Phantom prevents animations from disrupting page layout -->
+            <input 
+                class='input_matrix absolute_center phantom' 
+                id ='phantom_txt_{{ name }}[{{forloop.counter0}}]' 
+                style='{{ input_style }}'
+                disabled = 'disabled'
+            />
+        </div> 
+        {% endfor %}
+    </div>
+</div>
+<br>
+
+<!-- Set resizable property of set using jquery UI -->
+<script>
+    $( "#{{ name }}_emptyset" ).hide()
+    var cell_width = $( ".{{ name }}_cell" ).outerWidth();
+    var handle = document.getElementById('resize-{{ name }}');
+
+    $( "#{{ name }}_div" ).resizable({
+        handles:{'e':handle},
+        maxWidth:{{ max_elements }}*cell_width,
+    
+        resize: function( event, ui ) {
+            // if we try to shrink a lot, then it is the empty set
+            if ((ui.size.width < cell_width*0.8) && !($( "#{{ name }}_emptyset" ).is(":visible"))){
+                $( "#{{ name }}_emptyset" ).show();
+            }   
+            // upon reexpanding, empty set disappears
+            if ((ui.size.width > cell_width*1.2) && ($( "#{{ name }}_emptyset" ).is(":visible"))){
+               $( "#{{ name }}_emptyset" ).hide();
+            }
+            // in any case shrink and grow by increments of cell_width
+            ui.size.width = Math.max(1, Math.round( ui.size.width / cell_width )) * cell_width;
+        }
+    });
+</script>
+
+<!-- when answer is submitted, the matrix is set to its visible size, the hidden part is deleted -->
+<!-- this way the python variable holding the result has the correct dimension -->
+<script>
+    function on_submit_{{ name }}() {
+        // Determine number of elements in set
+        var hsize = $( "#{{ name }}_div" ).innerWidth();
+        var cell_width = $( ".{{ name }}_cell" ).outerWidth();
+        var num_elements = Math.min({{ max_elements }},Math.floor(hsize/cell_width));
+        if ($( "#{{ name }}_emptyset" ).is(":visible")) num_elements = 0;
+        console.log(num_elements);
+
+        // Construct a list with the cardinality of the input set
+        var set=[];
+        for(var j=0; j<num_elements; j++){
+            set.push('');
+        }
+            
+        // The input field will be interpreted as the declaration of an empty list
+        // with the correct size in python
+        $( "#form_dec_{{ name }}" ).val(JSON.stringify(set));
+        
+        // Remove from the document hidden elements of the input set
+        for(var i=num_elements; i<{{ max_elements }}; i++){
+                var string = "form_txt_{{ name }}["+i+"]";
+                document.getElementById(string).parentElement.remove();
+        }
+    }
+</script>
+    
+

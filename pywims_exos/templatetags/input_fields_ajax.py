@@ -118,6 +118,34 @@ def input_vmatrix(context, name, **kwargs):
 
     return {'name': name, 'matrix':matrix, 'max_rows': max_rows, 'max_cols': max_cols, 'input_style': input_style, 'cell_style': cell_style, 'cell_width': cell_width, 'cell_height': cell_height}
 
+# A set with variable number of elements
+@register.inclusion_tag('pywims_exos/input_set_ajax.html', takes_context=True)
+def input_set(context, name, **kwargs):
+
+    if 'input_style' in kwargs:
+        input_style = kwargs['input_style']
+    else: input_style = ''
+    
+    if 'cell_style' in kwargs:
+        cell_style = kwargs['cell_style']
+    else: cell_style = ''
+
+    if 'cell_width' in kwargs:
+        cell_width = kwargs['cell_width']
+    else: cell_width = '2em'
+    
+    if 'cell_height' in kwargs:
+        cell_height = kwargs['cell_height']
+    else: cell_height = '2em'
+     
+    if 'max_elements' in kwargs: 
+        max_elements = kwargs['max_elements']
+    else: max_elements = 10
+
+    set = ["" for j in range(max_elements)]
+
+    return {'name': name, 'set':set, 'max_elements': max_elements, 'input_style': input_style, 'cell_style': cell_style, 
+    'cell_width': cell_width, 'cell_height': cell_height}
 
 @register.inclusion_tag('pywims_exos/input_ggb_ajax.html')
 def input_ggb(name):

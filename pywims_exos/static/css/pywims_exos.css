@@ -221,10 +221,9 @@ div.cible, div.source, div.cibleOk, div.cibleNotOk { /* les divs qui contiennent
 	width: 10em;
 	height: auto;
 	margin : 6px;
-  vertical-align:top;
+    vertical-align:top;
 	justify-content: center;
 	align-items: center;
-	text-align:center;
 }
 div.cible  {
 	background:AntiqueWhite;
