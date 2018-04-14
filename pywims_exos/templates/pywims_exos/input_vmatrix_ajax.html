@@ -5,13 +5,13 @@
 <input type = 'hidden' id = 'form_dec_{{ name }}' value = '{{ matrix|tojson }}'/>
 
 <style>
-    .mamie{
+    .{{ name }}_mamie{
         display:inline-block;
         position: relative;
         margin: 5px;
         vertical-align: middle;
     }
-    .mamie:before, .mamie:after {
+    .{{ name }}_mamie:before, .{{ name }}_mamie:after {
         content: "";
         position: absolute;
         top: 0;
@@ -19,23 +19,23 @@
         width: 6px;
         height: 100%;
     }
-    .mamie:before {
+    .{{ name }}_mamie:before {
         left: -6px;
         border-right: 0;
     }
-    .mamie:after {
+    .{{ name }}_mamie:after {
         right: -6px;
         border-left: 0;
     }
     
-    .maman {
+    .{{ name }}_maman {
         display: inline-flex;
         flex-flow: column wrap;
         overflow: hidden;
         width: calc(2*{{ cell_width }});
         height:calc(2*{{ cell_height }});
     }
-    .papa {
+    .{{ name }}_papa {
       width: inherit;
       height: {{ cell_height }};
       margin:0;
@@ -43,7 +43,7 @@
       flex-flow: row wrap;
       overflow: hidden;
     }
-    .cell {
+    .{{ name }}_cell {
         height: {{ cell_height }};
         width: {{ cell_width }};
         margin:0;
@@ -51,7 +51,7 @@
     }
 </style>
 
-<div class ='mamie'>
+<div class ='{{ name }}_mamie'>
     <!-- The Handle to resize the matrix -->
     <span   
         style="
@@ -70,11 +70,11 @@
     </span>
     <!-- End of Handle -->
 
-    <div class='maman' id='{{ name }}_div'>
+    <div class='{{ name }}_maman' id='{{ name }}_div'>
         {% for line in matrix %}
-        <div class='papa'>
+        <div class='{{ name }}_papa'>
             {% for element in line %}
-            <div class='cell' id='{{ name }}_cell_div' style='{{ cell_style }}'>
+            <div class='{{ name }}_cell' id='{{ name }}_cell_div' style='{{ cell_style }}'>
                 <!-- tabindex makes element inaccessible by tabs, important otherwise hidden cells may become visible -->
                 <input 
                     class='input_matrix absolute_center' 
@@ -99,8 +99,8 @@
 
 <!-- Set resizable property of matrix using jquery UI -->
 <script>
-    var cell_height = $( ".cell" ).outerHeight();
-    var cell_width = $( ".cell" ).outerWidth();
+    var cell_height = $( ".{{ name }}_cell" ).outerHeight();
+    var cell_width = $( ".{{ name }}_cell" ).outerWidth();
     var handle = document.getElementById('resize-{{ name }}');
 
     $( "#{{ name }}_div" ).resizable({
@@ -120,8 +120,8 @@
         // Determine number of rows and columns of input matrix
         var vsize = $( "#{{ name }}_div" ).innerHeight();
         var hsize = $( "#{{ name }}_div" ).innerWidth();
-        var cell_height = $( ".cell" ).outerHeight();
-        var cell_width = $( ".cell" ).outerWidth();
+        var cell_height = $( ".{{ name }}_cell" ).outerHeight();
+        var cell_width = $( ".{{ name }}_cell" ).outerWidth();
         var num_rows = Math.min({{ max_rows }},Math.floor(vsize/cell_height));
         var num_cols = Math.min({{ max_cols }},Math.floor(hsize/cell_width));
 

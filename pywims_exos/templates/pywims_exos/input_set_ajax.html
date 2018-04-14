@@ -6,81 +6,76 @@
 
 <style>
     .{{ name }}_mamie{
-        display:inline-block;
+        display:inline-flex;
         position: relative;
-        margin: 5px;
-        vertical-align:-20%;
+        align-items:center;
+        flex-flow: row wrap;
+        vertical-align:middle;
+        /*border:1px solid black;*/
     }
-    .{{ name }}_mamie:before, .{{ name }}_mamie:after {
-        content: "";
-        position: absolute;
-        bottom: calc(0.15*{{ cell_height }});
-        height: 100%;
-        font-family: Georgia, serif;
-        font-size: {{ cell_height }}
-    }
-    .{{ name }}_mamie:before {
-        left: -6px;
-        content: "{";
-    }
-    .{{ name }}_mamie:after {
-        right: -6px;
-        content:"}";
-    }
-    
+
     .{{ name }}_papa {
-      width: calc(2*{{ cell_width }});
-      height: {{ cell_height }};
       margin:0;
       display: inline-flex;
       flex-flow: row wrap;
       overflow: hidden;
+      align-items:center;
     }
     .{{ name }}_cell {
-        height: {{ cell_height }};
-        width: {{ cell_width }};
         margin:0;
         position:relative;
+        /*border:1px solid black;*/
     }
-    .{{ name }}_cell:before{
-        content: ",";
+    .{{ name }}_virgule{
         position: absolute;
-        left: -6px;
-        bottom: calc(0.15*{{ cell_height }});
-        height: 100%;
-        font-size: {{ cell_height }}
     }
+    .{{ name }}_bracket{
+        margin-top:-4px;
+    }
+    /* placement of the hand */
     .ui-resizable-e {
-        right:-24px;
-        top:24px;
+        top:70%;
+        right:-15px;
+
     }
 </style>
 
+<!-- serves as a measure of sizes, will be removed by javascript -->
+<input 
+    class='input_matrix absolute_center' 
+    id ='{{ name }}_temoin'
+    style='{{ input_style }}'
+/>
+
 <div class ='{{ name }}_mamie'>
+
+    <!-- The left curly brace -->
+    <span class='{{ name }}_bracket'>{ </span>
+    
     <!-- The Handle to resize the matrix -->
     <img         
         id='resize-{{ name }}'
         class="ui-resizable-handle ui-resizable-e"
-        src="{% static 'ui/grab_icon.png' %}" style="width:20px;height:20px;"
+        src="{% static 'ui/grab_icon.png' %}" 
+        style="width:20px;height:20px;"
     >
     <!-- End of Handle -->
-
+    
     <div class ='{{ name }}_papa' id='{{ name }}_div'>
+
+        <!-- The emptyset -->
         <div id='{{ name }}_emptyset' class='{{ name }}_cell' style='{{ cell_style }}'>
-        <input 
-            class='input_matrix absolute_center' 
-            style=' 
-                font-size: calc(0.8*{{ cell_height }});
-                font-style: normal;
-                {{ input_style }};
-                background-color:inherit;'
-            tabindex="-1"
-            value="&#8709;"
-        />
+            <span class='absolute_center' style='display:inline-block;'> &#8709;</span>
         </div> 
+        
+        <!-- the set elements -->
 
         {% for element in set %}
         <div class='{{ name }}_cell' style='{{ cell_style }}'>
+            
+            <!-- comma separating elements, absolute positioning will make the first one overflow, hence hidden -->
+            <div class='{{ name }}_virgule'>,</div>
+
             <!-- tabindex makes element inaccessible by tabs, important otherwise hidden cells may become visible -->
             <input 
                 class='input_matrix absolute_center' 
@@ -89,6 +84,7 @@
                 value = '{{ element|default_if_none:"" }}'
                 tabindex="-1"
             />
+            
             <!-- Phantom prevents animations from disrupting page layout -->
             <input 
                 class='input_matrix absolute_center phantom' 
@@ -99,14 +95,36 @@
         </div> 
         {% endfor %}
     </div>
+    <!-- The right curly brace -->
+    <span class='{{ name }}_bracket'>}</span>
 </div>
 <br>
 
-<!-- Set resizable property of set using jquery UI -->
+<!-- Set sizes/resizable property of set using jquery UI -->
 <script>
+    // hide empty set
     $( "#{{ name }}_emptyset" ).hide()
-    var cell_width = $( ".{{ name }}_cell" ).outerWidth();
+    // retrieve dimensions of input field, then remove it
+    var input_width = $( "#{{ name }}_temoin" ).outerWidth();
+    var input_height = $( "#{{ name }}_temoin" ).outerHeight();
+    $( "#{{ name }}_temoin" ).remove();
+    
+    // put inout field in larger cell
+    var cell_width = input_width*2;
+    var cell_height = input_height;
+    
+    // set dimensions
+    $( ".{{ name }}_papa" ).css("height", cell_height);
+    $( ".{{ name }}_papa" ).css("width", cell_width);
+    $( ".{{ name }}_cell" ).css("height", cell_height);
+    $( ".{{ name }}_cell" ).css("width", cell_width);
+    $( "#{{ name }}_emptyset,.{{ name }}_virgule, .{{ name }}_bracket" ).css("font-size", input_height);
+    $( "#{{ name }}_emptyset,.{{ name }}_virgule, .{{ name }}_bracket, .{{ name }}_mamie" ).css("font-family", "helvetica");
+    $( ".{{ name }}_virgule" ).css("left", -0.43*input_width);
+    $( ".{{ name }}_virgule" ).css("bottom", -0.2*input_height);
+
     var handle = document.getElementById('resize-{{ name }}');
+    
 
     $( "#{{ name }}_div" ).resizable({
         handles:{'e':handle},
