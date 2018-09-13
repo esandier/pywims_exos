@@ -1,0 +1,157 @@
+{% load json_filter %}
+{% load static %}
+
+<!-- hidden input declares the matrix so it can be later populated -->
+<input type = 'hidden' id = 'form_dec_{{ name }}' value = '{{ matrix|tojson }}'/>
+
+<style>
+    .{{ name }}_mamie{
+        display:inline-block;
+        position: relative;
+        margin: 5px;
+        vertical-align: middle;
+    }
+    .{{ name }}_mamie:before, .{{ name }}_mamie:after {
+        content: "";
+        position: absolute;
+        top: 0;
+        border: 2px solid #000;
+        width: 6px;
+        height: 100%;
+    }
+    .{{ name }}_mamie:before {
+        left: -6px;
+        border-right: 0;
+    }
+    .{{ name }}_mamie:after {
+        right: -6px;
+        border-left: 0;
+    }
+    
+    .{{ name }}_maman {
+        display: inline-flex;
+        flex-flow: column wrap;
+        overflow: hidden;
+        width: calc(2*{{ cell_width }});
+        height:calc(2*{{ cell_height }});
+    }
+    .{{ name }}_papa {
+      width: inherit;
+      height: {{ cell_height }};
+      margin:0;
+      display: flex;
+      flex-flow: row wrap;
+      overflow: hidden;
+    }
+    .{{ name }}_cell {
+        height: {{ cell_height }};
+        width: {{ cell_width }};
+        margin:0;
+        position:relative;
+    }
+</style>
+
+<div class ='{{ name }}_mamie'>
+    <!-- The Handle to resize the matrix -->
+    <span   
+        style="
+            height: 16px; 
+            width: 16px;
+            position: absolute;
+            opacity:100;
+            bottom: -10px;
+            right:-24px;
+            z-index:11;
+        " 
+        id='resize-{{ name }}'
+        class="ui-resizable-handle ui-resizable-se"
+    >
+        <img id='{{ name }}_handle' src="{% static 'ui/grab_icon.png' %}" style="width:24px;height:24px;">
+    </span>
+    <!-- End of Handle -->
+
+    <div class='{{ name }}_maman' id='{{ name }}_div'>
+        {% for line in matrix %}
+        <div class='{{ name }}_papa'>
+            {% for element in line %}
+            <div class='{{ name }}_cell' id='{{ name }}_cell_div' style='{{ cell_style }}'>
+                <!-- tabindex makes element inaccessible by tabs, important otherwise hidden cells may become visible -->
+                <input 
+                    class='input_matrix absolute_center' 
+                    id ='form_txt_{{ name }}[{{forloop.parentloop.counter0}}][{{forloop.counter0}}]' 
+                    style='{{ input_style }}'
+                    tabindex="-1"
+                />
+                <!-- Phantom prevents animations from disrupting page layout -->
+                <input 
+                    class='input_matrix absolute_center phantom' 
+                    id ='phantom_txt_{{ name }}[{{forloop.parentloop.counter0}}][{{forloop.counter0}}]' 
+                    style='{{ input_style }}'
+                    disabled = 'disabled'
+                />
+            </div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+<br>
+
+<!-- Set resizable property of matrix using jquery UI -->
+<script>
+    var cell_height = $( ".{{ name }}_cell" ).outerHeight();
+    var cell_width = $( ".{{ name }}_cell" ).outerWidth();
+    var handle = document.getElementById('resize-{{ name }}');
+
+    $( "#{{ name }}_div" ).resizable({
+        handles:{se:handle},
+        grid:[cell_width,cell_height],
+        minWidth:cell_width,
+        minHeight:cell_height,
+        maxWidth:{{ max_cols }}*cell_width,
+        maxHeight:{{ max_rows }}*cell_height
+    });
+</script>
+
+<!-- when answer is submitted, the matrix is set to its visible size, the hidden part is deleted -->
+<!-- this way the python variable holding the result has the correct dimension -->
+<script>
+    function on_submit_{{ name }}() {
+        // Determine number of rows and columns of input matrix
+        var vsize = $( "#{{ name }}_div" ).innerHeight();
+        var hsize = $( "#{{ name }}_div" ).innerWidth();
+        var cell_height = $( ".{{ name }}_cell" ).outerHeight();
+        var cell_width = $( ".{{ name }}_cell" ).outerWidth();
+        var num_rows = Math.min({{ max_rows }},Math.floor(vsize/cell_height));
+        var num_cols = Math.min({{ max_cols }},Math.floor(hsize/cell_width));
+
+        // Construct an empty matrix with the dimensions of the input matrix
+        var matrix=[];
+        for(var i=0; i<num_rows; i++){
+            matrix.push([]);
+            for(var j=0; j<num_cols; j++){
+                matrix[i].push('');
+            }
+        }
+            
+        // The input field will be interpreted as the declaration of an empty matrix 
+        // with the correct size in python
+        $( "#form_dec_{{ name }}" ).val(JSON.stringify(matrix));
+        
+        // Remove from the document hidden rows and columns of the input matrix
+        for(var i=num_rows; i<{{ max_rows }}; i++){
+            // a full row is deleted
+            var string = "form_txt_{{ name }}["+i+"]["+j+"]";
+            document.getElementById(string).parentElement.parentElement.remove();
+        }
+        for(var i=0; i<num_rows; i++){
+            // only part of the row is deleted, we need to cycle through elements individually
+            for(var j=num_cols; j<{{ max_cols }}; j++){
+                var string = "form_txt_{{ name }}["+i+"]["+j+"]";
+                document.getElementById(string).parentElement.remove();
+            }
+        }
+    }
+</script>
+    
+

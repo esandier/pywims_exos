@@ -177,8 +177,7 @@ button.dev-titre, span.dev-titre { /* titre de l'exo */
 }
 
 /* Les champs input */
-/* Tout ce qui contient OK ou NotOK est OBSOLETE */
-.input, .cible, .source, .drag-contenu, .cibleOK, .cibleNotOK {
+.input, .cible, .source, .drag-contenu {
 	border : 2px solid Black;
 	border-radius:8px;
 	font-style: italic;
@@ -215,10 +214,10 @@ button.dev-titre, span.dev-titre { /* titre de l'exo */
   z-index: 0;
 }
 
-div.cible, div.source, div.cibleOk, div.cibleNotOk { /* les divs qui contiennent les champs drag-drop */
-  display: inline-flex;
-  border:none;
-	width: 10em;
+div.cible, div.source { /* les divs qui contiennent les champs drag-drop */
+    display: inline-flex;
+    border:none;
+    width: 10em;
 	height: auto;
 	margin : 6px;
     vertical-align:top;
@@ -227,12 +226,6 @@ div.cible, div.source, div.cibleOk, div.cibleNotOk { /* les divs qui contiennent
 }
 div.cible  {
 	background:AntiqueWhite;
-}
-div.cibleOk {
-	background:LightGreen;
-}
-div.cibleNotOk  {
-	background:LightPink;
 }
 div.source  {
 	background:Burlywood;

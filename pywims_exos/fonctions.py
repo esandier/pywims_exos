@@ -25,7 +25,7 @@ def py_wims(a):
 def is_nombre(a):
 # détermine si a est un nombre, avant même évaluation/simplification
     number_types = [int, float, numbers.Catalan, numbers.EulerGamma, numbers.Exp1, \
-        numbers.Float, numbers.Half, numbers.ImaginaryUnit, numbers.Integer, numbers.NegativeOne, numbers.One, numbers.Pi]
+        numbers.Float, numbers.Half, numbers.ImaginaryUnit, numbers.Integer, numbers.NegativeOne, numbers.One, numbers.Pi, numbers.Zero]
     return type(a) in number_types
 
 def is_fraction(a):

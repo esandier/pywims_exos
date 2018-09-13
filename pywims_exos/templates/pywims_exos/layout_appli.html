@@ -12,13 +12,18 @@
 <link rel="stylesheet" href="{% static 'css/pywims_exos.css' %}">
 <!-- Mathjax -->
 <script type="text/x-mathjax-config">
+MathJax.Ajax.config.path["Contrib"] = "https://github.com/mathjax/MathJax-third-party-extensions/tree/master/legacy/";
+
 MathJax.Hub.Config({
+    tex: {
+        extensions: ["[Contrib]/forminput/forminput.js"]
+    },
 	tex2jax: {
 		inlineMath: [ ['$','$'], ["\\(","\\)"] ],
 		displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
 		processEscapes: true,
 	},
-	menuSettings: { inTabOrder : false }
+	menuSettings: { inTabOrder : false },
 //	displayAlign : "left",
 //	displayIndent : "2em"
 });
@@ -26,9 +31,10 @@ MathJax.Hub.Config({
 <script type="text/javascript"
 src="https://cdn.rawgit.com/mathjax/MathJax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
 </script>
-<!-- USELESS
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
--->
+<!-- JSXGRAPH -->
+ <link rel="stylesheet" type="text/css" href="http://jsxgraph.uni-bayreuth.de/distrib/jsxgraph.css" />
+ <script type="text/javascript" src="http://jsxgraph.uni-bayreuth.de/distrib/jsxgraphcore.js"></script>
+<!-- end JSXGRAPH -->
 
 <!-- DRAG-DROP script MOVE ELSEWHERE (TAG DEFINITION?) -->
 	<script>
