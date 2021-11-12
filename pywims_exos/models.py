@@ -38,7 +38,7 @@ def execution(code_string="", dictionnaire={}, inputs=[], declarations = [], **k
                 
                 seed(current_seed)
 
-                exec(code_string)
+                exec(code_string, globals().update(locals()))
 
                 self.variables = locals()
                 self.seed = current_seed
