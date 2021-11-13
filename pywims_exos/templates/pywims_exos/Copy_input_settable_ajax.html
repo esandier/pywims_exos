@@ -1,0 +1,177 @@
+{% load json_filter %}
+{% load static %}
+
+<!-- hidden input declares the set so it can be later populated -->
+<input type = 'hidden' id = 'form_dec_{{ name }}' value = '{{ set|tojson }}'/>
+
+<style>
+    .{{ name }}_mamie{
+        display:inline-flex;
+        position: relative;
+        align-items:center;
+        flex-flow: row wrap;
+        vertical-align:middle;
+        /*border:1px solid black;*/
+    }
+
+    .{{ name }}_papa {
+      margin:0;
+      display: inline-flex;
+      flex-flow: row wrap;
+      overflow: hidden;
+      align-items:center;
+    }
+    .{{ name }}_cell {
+        margin:0;
+        position:relative;
+        /*border:1px solid black;*/
+    }
+    .{{ name }}_virgule{
+        position: absolute;
+    }
+    .{{ name }}_bracket{
+        margin-top:-4px;
+    }
+    /* placement of the hand */
+    .ui-resizable-e {
+        top:70%;
+        right:-15px;
+
+    }
+</style>
+
+<!-- serves as a measure of sizes, will be removed by javascript -->
+<input 
+    class='input_matrix absolute_center' 
+    id ='{{ name }}_temoin'
+    style='{{ input_style }}'
+/>
+
+<div class ='{{ name }}_mamie'>
+
+    <!-- The left curly brace -->
+    <span class='{{ name }}_bracket'>{ </span>
+    
+    <!-- The Handle to resize the matrix -->
+    <img         
+        id='resize-{{ name }}'
+        class="ui-resizable-handle ui-resizable-e"
+        src="{% static 'ui/grab_icon.png' %}" 
+        style="width:20px;height:20px;"
+    >
+    <!-- End of Handle -->
+    
+    <div class ='{{ name }}_papa' id='{{ name }}_div'>
+
+        <!-- The emptyset -->
+        <div id='{{ name }}_emptyset' class='{{ name }}_cell' style='{{ cell_style }}'>
+            <!-- <span class='absolute_center' style='display:inline-block;'> &#8709;</span> -->
+        </div> 
+        
+        <!-- the set elements -->
+
+        {% for element in set %}
+        <div class='{{ name }}_cell' style='{{ cell_style }}'>
+            
+            <!-- comma separating elements, absolute positioning will make the first one overflow, hence hidden -->
+            <div class='{{ name }}_virgule'>,</div>
+
+            <!-- tabindex makes element inaccessible by tabs, important otherwise hidden cells may become visible -->
+            <input 
+                class='input_matrix absolute_center' 
+                id ='form_txt_{{ name }}[{{forloop.counter0}}]' 
+                style='{{ input_style }}'
+                value = '{{ element|default_if_none:"" }}'
+                tabindex="-1"
+            />
+            
+            <!-- Phantom prevents animations from disrupting page layout -->
+            <input 
+                class='input_matrix absolute_center phantom' 
+                id ='phantom_txt_{{ name }}[{{forloop.counter0}}]' 
+                style='{{ input_style }}'
+                disabled = 'disabled'
+            />
+        </div> 
+        {% endfor %}
+    </div>
+    <!-- The right curly brace -->
+    <span class='{{ name }}_bracket'>}</span>
+</div>
+<br>
+
+<!-- Set sizes/resizable property of set using jquery UI -->
+<script>
+    // hide empty set
+    $( "#{{ name }}_emptyset" ).hide()
+    // retrieve dimensions of input field, then remove it
+    var input_width = $( "#{{ name }}_temoin" ).outerWidth();
+    var input_height = $( "#{{ name }}_temoin" ).outerHeight();
+    $( "#{{ name }}_temoin" ).remove();
+    
+    // put inout field in larger cell
+    var cell_width = input_width*2;
+    var cell_height = input_height;
+    
+    // set dimensions
+    $( ".{{ name }}_papa" ).css("height", cell_height);
+    $( ".{{ name }}_papa" ).css("width", cell_width);
+    $( ".{{ name }}_cell" ).css("height", cell_height);
+    $( ".{{ name }}_cell" ).css("width", cell_width);
+    $( "#{{ name }}_emptyset,.{{ name }}_virgule, .{{ name }}_bracket" ).css("font-size", input_height);
+    $( "#{{ name }}_emptyset,.{{ name }}_virgule, .{{ name }}_bracket, .{{ name }}_mamie" ).css("font-family", "helvetica");
+    $( ".{{ name }}_virgule" ).css("left", -0.43*input_width);
+    $( ".{{ name }}_virgule" ).css("bottom", -0.2*input_height);
+
+    var handle = document.getElementById('resize-{{ name }}');
+    
+
+    $( "#{{ name }}_div" ).resizable({
+        handles:{'e':handle},
+        maxWidth:{{ max_elements }}*cell_width,
+    
+        resize: function( event, ui ) {
+            // if we try to shrink a lot, then it is the empty set
+            if ((ui.size.width < cell_width*0.8) && !($( "#{{ name }}_emptyset" ).is(":visible"))){
+                $( "#{{ name }}_emptyset" ).show();
+            }   
+            // upon reexpanding, empty set disappears
+            if ((ui.size.width > cell_width*1.2) && ($( "#{{ name }}_emptyset" ).is(":visible"))){
+               $( "#{{ name }}_emptyset" ).hide();
+            }
+            // in any case shrink and grow by increments of cell_width
+            ui.size.width = Math.max(1, Math.round( ui.size.width / cell_width )) * cell_width;
+        }
+    });
+</script>
+
+<!-- when answer is submitted, the matrix is set to its visible size, the hidden part is deleted -->
+<!-- this way the python variable holding the result has the correct dimension -->
+<script>
+    function on_submit_{{ name }}() {
+        // Determine number of elements in set
+        var hsize = $( "#{{ name }}_div" ).innerWidth();
+        var cell_width = $( ".{{ name }}_cell" ).outerWidth();
+        var num_elements = Math.min({{ max_elements }},Math.floor(hsize/cell_width));
+        if ($( "#{{ name }}_emptyset" ).is(":visible")) num_elements = 0;
+        console.log(num_elements);
+
+        // Construct a list with the cardinality of the input set
+        var set=[];
+        for(var j=0; j<num_elements; j++){
+            set.push('');
+        }
+            
+        // The input field will be interpreted as the declaration of an empty list
+        // with the correct size in python
+        $( "#form_dec_{{ name }}" ).val(JSON.stringify(set));
+        
+        // Remove from the document hidden elements of the input set
+        for(var i=num_elements; i<{{ max_elements }}; i++){
+                var string = "form_txt_{{ name }}["+i+"]";
+                document.getElementById(string).parentElement.remove();
+        }
+    }
+</script>
+    
+

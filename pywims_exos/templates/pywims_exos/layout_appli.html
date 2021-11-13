@@ -1,4 +1,4 @@
-﻿{% load static %}
+{% load static %}
 
 <html>
 <head>
@@ -36,6 +36,23 @@ src="https://cdn.rawgit.com/mathjax/MathJax/2.7.1/MathJax.js?config=TeX-AMS-MML_
  <script type="text/javascript" src="http://jsxgraph.uni-bayreuth.de/distrib/jsxgraphcore.js"></script>
 <!-- end JSXGRAPH -->
 
+	
+<!--- jquery / jquery ui -->
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+
+</head>
+<body>
+<!-- USELESS
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+-->
+<!-- Bootstrap -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js"></script>
+
+
 <!-- DRAG-DROP script MOVE ELSEWHERE (TAG DEFINITION?) -->
 	<script>
 	function allowDrop(ev) {
@@ -52,32 +69,18 @@ src="https://cdn.rawgit.com/mathjax/MathJax/2.7.1/MathJax.js?config=TeX-AMS-MML_
 		// data est l'id de la cible du drop
 		var data=ev.dataTransfer.getData("text");
 		// Le drop
-		//console.log(target, data);
 		document.getElementById(target).appendChild(document.getElementById(data));
 		// Renseignement de la variable via un champ "input" caché, dont l'id est celle le la cible, préfacée par 'input_'
 		//var input=document.getElementById('input_'+data);
 		//if (target != undefined) input.value = target;
 		//if (target == undefined) input.value = '';
-		var input_ajax=document.getElementById('form_drg_'+data);
+		var input_ajax=document.getElementById('form_drg_' + data.substring(8));// on enlève le "display_" du nom 
 		if (target != undefined) input_ajax.value = target;
 		if (target == undefined) input_ajax.value = '';
 	}
 	</script>
-	
-<!--- jquery / jquery ui -->
-  <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<!-- end DRAG-DROP script -->
 
-
-</head>
-<body>
-<!-- USELESS
-<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
--->
-<!-- Bootstrap -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js"></script>
 
 {% block contenu %}
 {% endblock %}

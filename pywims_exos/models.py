@@ -1,4 +1,4 @@
-﻿from django.db import models
+from django.db import models
 from django.conf import settings
 from django.template import Template, Context
 import os
@@ -38,7 +38,7 @@ def execution(code_string="", dictionnaire={}, inputs=[], declarations = [], **k
                 
                 seed(current_seed)
 
-                exec(code_string)
+                exec(code_string,globals().update(locals()))
 
                 self.variables = locals()
                 self.seed = current_seed
@@ -78,7 +78,7 @@ class Exo(models.Model):
             {'name': 'reponse', 'label': 'Réponse', 'langage':'django'}]}
     # layout de l'exo. Pour l'instant 'standard' ou 'geogebra'
     layout = models.CharField(max_length=3, choices=EXO_LAYOUTS, default = 'STD')
-    author = models.ForeignKey('auth.User')
+    author = models.ForeignKey('auth.User', on_delete=models.DO_NOTHING)
     title = models.CharField(max_length=200)
     # Fichier geogebra qui contient la construction initiale
     ggb_file = models.FileField(upload_to = 'ggb_files', blank = True, default = '')

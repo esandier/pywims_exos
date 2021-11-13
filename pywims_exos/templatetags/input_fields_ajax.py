@@ -118,6 +118,41 @@ def input_vmatrix(context, name, **kwargs):
 
     return {'name': name, 'matrix':matrix, 'max_rows': max_rows, 'max_cols': max_cols, 'input_style': input_style, 'cell_style': cell_style, 'cell_width': cell_width, 'cell_height': cell_height}
 
+# A matrix of input fields which can be user resized (identical to input-vmatrix, but uses different template)
+@register.inclusion_tag('pywims_exos/input_vtable_ajax.html', takes_context=True)
+def input_vtable(context, name, **kwargs):
+
+    if 'input_style' in kwargs:
+        input_style = kwargs['input_style']
+    else: input_style = ''
+    
+    if 'cell_style' in kwargs:
+        cell_style = kwargs['cell_style']
+    else: cell_style = ''
+
+    if 'cell_width' in kwargs:
+        cell_width = kwargs['cell_width']
+    else: cell_width = '2em'
+    
+    if 'cell_height' in kwargs:
+        cell_height = kwargs['cell_height']
+    else: cell_height = '2em'
+     
+    if 'max_rows' in kwargs: 
+        max_rows = kwargs['max_rows']
+    else: max_rows = 10
+        
+    if 'max_cols' in kwargs: 
+        max_cols = kwargs['max_cols']
+    else: max_cols = 10
+    
+    matrix = []
+    for i in range(max_rows):
+        matrix.append([])
+        for j in range(max_cols): matrix[i].append('')
+
+    return {'name': name, 'matrix':matrix, 'max_rows': max_rows, 'max_cols': max_cols, 'input_style': input_style, 'cell_style': cell_style, 'cell_width': cell_width, 'cell_height': cell_height}
+
 # A set with variable number of elements
 @register.inclusion_tag('pywims_exos/input_set_ajax.html', takes_context=True)
 def input_set(context, name, **kwargs):

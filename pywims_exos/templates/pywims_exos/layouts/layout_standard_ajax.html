@@ -1,4 +1,4 @@
-﻿{% extends 'pywims_exos/layout_appli.html' %}
+{% extends 'pywims_exos/layout_appli.html' %}
 {% load input_fields_ajax %}
 {% load json_filter %}
 
@@ -119,10 +119,10 @@ $( document ).ready(function(){
     for(var i = 0; i < inputs['drg'].length; i++){
       var input = inputs['drg'][i];
       // to be painted, the drag element must be on a drop element
-      if ((input.value.slice(0,7) == 'origin_') || (input.value == '')) continue;
+      if ((input.value.slice(0,5) == 'drag_') || (input.value == '')) continue;
       // in drag fields, the element to be painted is not the input element, which is hidden
-      // its id is simply "name", whereas the input's id is "form_drg_name"
-      $(document.getElementById( input.id )).styling('drg', input.style);
+      // its id is "display_name", whereas the input's id is "form_drg_name"
+      $(document.getElementById( 'display_'+input.id )).styling('drg', input.style);
     }
   }
   

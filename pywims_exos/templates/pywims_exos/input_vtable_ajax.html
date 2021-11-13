@@ -1,0 +1,152 @@
+{% load json_filter %}
+{% load static %}
+
+<style>
+    .{{ name }}_mamie{
+        display:inline-block;
+        position: relative;
+        margin: 5px;
+        vertical-align: middle;
+    }
+    .{{ name }}_mamie:before, .{{ name }}_mamie:after {
+        content: "";
+        position: absolute;
+        top: 0;
+        border: 2px solid #000;
+        width: 6px;
+        height: 100%;
+    }
+    .{{ name }}_mamie:before {
+        left: -6px;
+        border-right: 0;
+    }
+    .{{ name }}_mamie:after {
+        right: -6px;
+        border-left: 0;
+    }
+    
+    .{{ name }}_maman {
+        display: inline-block;
+        overflow: hidden;
+        width: calc(2*{{ cell_width }});
+        height: calc(2*{{ cell_height }});
+    }
+    .{{ name }}_table {
+        table-layout:fixed;
+        width: calc({{ max_cols }}*{{ cell_width }});
+        height: calc({{ max_rows }}*{{ cell_height }});
+    }
+    .{{ name }}_cell {
+        height: {{ cell_height }};
+        width: {{ cell_width }};
+        margin:0;
+        position:relative;
+    }
+</style>
+
+
+<!-- hidden input declares the matrix so it can be later populated 
+<input type = 'hidden' id = 'form_dec_{{ name }}' value = '{{ matrix|tojson }}'/>-->
+<input type = 'hidden' id = 'form_txt_{{ name }}' value = ''/>
+
+
+<div class ='{{ name }}_mamie'>
+    <!-- The Handle to resize the matrix -->
+    <span   
+        style="
+            height: 16px; 
+            width: 16px;
+            position: absolute;
+            opacity:100;
+            bottom: -10px;
+            right:-24px;
+            z-index:11;
+        " 
+        id='resize-{{ name }}'
+        class="ui-resizable-handle ui-resizable-se"
+    >
+        <img id='{{ name }}_handle' src="{% static 'ui/grab_icon.png' %}" style="width:24px;height:24px;">
+    </span>
+    <!-- End of Handle -->
+    <div class='{{ name }}_maman' id='{{ name }}_div'>
+    <table class = '{{ name }}_table'>
+        {% for line in matrix %}
+        <tr>
+            {% for element in line %}
+            <td class='{{ name }}_cell' id='{{ name }}_cell_div' style='{{ cell_style }}'>
+                <!-- tabindex makes element inaccessible by tabs, important otherwise hidden cells may become visible -->
+                <input 
+                    class='input_matrix absolute_center' 
+                    id ='form_txt_{{ name }}{{forloop.parentloop.counter0}}{{forloop.counter0}}' 
+                    style='{{ input_style }}'
+                    tabindex="-1"
+                    value='{{ element }}'
+                />
+                <!-- Phantom prevents animations from disrupting page layout -->
+                <input 
+                    class='input_matrix absolute_center phantom' 
+                    id ='phantom_txt_{{ name }}{{forloop.parentloop.counter0}}{{forloop.counter0}}' 
+                    style='{{ input_style }}'
+                    disabled = 'disabled'
+                />
+            </td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+    </div>
+</div>
+
+<!-- Set resizable property of matrix using jquery UI -->
+<script>
+    var cell_height = $( ".{{ name }}_cell" ).outerHeight();
+    var cell_width = $( ".{{ name }}_cell" ).outerWidth();
+    var handle = document.getElementById('resize-{{ name }}');
+
+    $( "#{{ name }}_div" ).resizable({
+        handles:{se:handle},
+        grid:[cell_width,cell_height],
+        minWidth:cell_width,
+        minHeight:cell_height,
+        maxWidth:{{ max_cols }}*cell_width,
+        maxHeight:{{ max_rows }}*cell_height
+    });
+</script>
+
+<!-- when answer is submitted, the matrix is set to its visible size, the hidden part is deleted -->
+<!-- this way the python variable holding the result has the correct dimension -->
+<script>
+    function on_submit_{{ name }}() {
+        // Determine number of rows and columns of input matrix
+        var vsize = $( "#{{ name }}_div" ).innerHeight();
+        var hsize = $( "#{{ name }}_div" ).innerWidth();
+        var cell_height = $( ".{{ name }}_cell" ).outerHeight();
+        var cell_width = $( ".{{ name }}_cell" ).outerWidth();
+        var num_rows = Math.min({{ max_rows }},Math.floor(vsize/cell_height));
+        var num_cols = Math.min({{ max_cols }},Math.floor(hsize/cell_width));
+
+        // Construct a matrix as a string to be sympified from the entries
+        var matrix='Matrix([';
+        for(var i=0; i<num_rows; i++){
+            matrix += '[';
+            for(var j=0; j<num_cols; j++){
+                var string = "form_txt_{{ name }}"+i+j;
+                var value = document.getElementById(string).value;
+                if (value == '') value = 'None';
+                matrix += value;
+                if (j != num_cols-1) matrix += ',';
+            }
+            matrix += ']';
+            if (i != num_rows-1) matrix +=',';            
+        }
+        matrix += '])';
+
+            
+        // The input field will be interpreted as the declaration of an empty matrix 
+        // with the correct size in python
+        $( "#form_txt_{{ name }}" ).val(matrix);
+        
+    }
+</script>
+    
+
